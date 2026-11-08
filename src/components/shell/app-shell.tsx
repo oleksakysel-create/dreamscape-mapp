@@ -95,7 +95,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      <div className="flex min-h-dvh flex-col">
+      <div className="flex min-h-dvh min-w-0 flex-col">
         <header className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-canvas/85 px-4 py-3 backdrop-blur lg:hidden">
           <Link href="/journey">
             <Logo className="[&_span]:text-lg" />

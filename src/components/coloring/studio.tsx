@@ -158,16 +158,16 @@ export function ColoringStudio({ month, coloring }: { month: number; coloring: M
         </span>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="flex min-w-0 flex-col gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <ToolButton label="Undo" onClick={doUndo} disabled={!history.past.length}>
               <Undo2 />
             </ToolButton>
             <ToolButton label="Redo" onClick={doRedo} disabled={!history.future.length}>
               <Redo2 />
             </ToolButton>
-            <span className="mx-1 h-6 w-px bg-line" />
+            <span className="mx-0.5 hidden h-6 w-px bg-line sm:block" />
             <ToolButton label="Zoom in" onClick={() => canvasRef.current?.zoomBy(1.4)}>
               <ZoomIn />
             </ToolButton>
@@ -189,7 +189,7 @@ export function ColoringStudio({ month, coloring }: { month: number; coloring: M
           <p className="text-center text-xs text-muted">Tap to fill · drag to pan when zoomed · pinch or scroll to zoom · ⌘Z to undo</p>
         </div>
 
-        <aside className="flex flex-col gap-4 rounded-3xl border border-line bg-surface p-5 shadow-soft lg:sticky lg:top-6 lg:self-start">
+        <aside className="flex min-w-0 flex-col gap-4 rounded-3xl border border-line bg-surface p-5 shadow-soft lg:sticky lg:top-6 lg:self-start">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Chapter {month} · {chapter.title}</p>
             <h1 className="font-display text-2xl font-semibold">{meta.title}</h1>
@@ -208,6 +208,7 @@ export function ColoringStudio({ month, coloring }: { month: number; coloring: M
             <span className="size-9 rounded-full ring-2 ring-surface shadow-soft" style={{ background: eraser ? "#fff" : color }} data-testid="current-color" />
             <span className="text-sm">{eraser ? "Eraser — tap to clear a shape" : "Current color"}</span>
           </div>
+          <div className="max-lg:-order-1">
           <PalettePicker
             color={color}
             eraser={eraser}
@@ -220,6 +221,7 @@ export function ColoringStudio({ month, coloring }: { month: number; coloring: M
             onEraser={() => setEraser((e) => !e)}
             onPalette={setPaletteId}
           />
+          </div>
           {coloring.completedAt && (
             <p className="flex items-center gap-2 rounded-2xl bg-sage-soft p-3 text-sm">
               <Check className="size-4 text-sage" /> Completed — you can keep refining anytime.
@@ -263,7 +265,7 @@ function ToolButton({ label, children, ...props }: { label: string } & React.But
       type="button"
       aria-label={label}
       title={label}
-      className="grid size-10 place-items-center rounded-full border border-line bg-surface text-ink shadow-soft transition hover:bg-surface-2 disabled:opacity-40 [&_svg]:size-[18px]"
+      className="grid size-9 shrink-0 place-items-center rounded-full sm:size-10 border border-line bg-surface text-ink shadow-soft transition hover:bg-surface-2 disabled:opacity-40 [&_svg]:size-[18px]"
       {...props}
     >
       {children}

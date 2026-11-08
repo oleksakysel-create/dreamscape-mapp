@@ -91,12 +91,14 @@ export default function JourneyPage() {
                       <IllustrationThumb imageId={coloring.imageId} fills={coloring.fills} />
                     </div>
                   )}
-                  {isNow && <span className="absolute left-4 top-3 rounded-full bg-white/85 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-primary">Now</span>}
-                  {complete && (
-                    <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-white/85 px-2 py-0.5 text-[11px] font-bold text-sage">
-                      <Sparkles className="size-3" /> Complete
-                    </span>
-                  )}
+                  <div className="absolute left-4 top-3 flex gap-1.5">
+                    {isNow && <span className="rounded-full bg-white/85 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-primary">Now</span>}
+                    {complete && (
+                      <span className="flex items-center gap-1 rounded-full bg-white/85 px-2 py-0.5 text-[11px] font-bold text-sage">
+                        <Sparkles className="size-3" /> Complete
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="flex flex-1 flex-col gap-3 p-4">
                   <div>
