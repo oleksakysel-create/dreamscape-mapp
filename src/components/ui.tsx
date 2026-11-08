@@ -132,7 +132,7 @@ export function Toast() {
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -16, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-            className="glass rounded-2xl px-4 py-3 text-center"
+            className="glass rounded-2xl px-4 py-3 text-center pointer-events-none"
           >
             <div className="text-[14px] font-semibold">{toast.title}</div>
             {toast.sub && <div className="text-[12px] text-mute mt-0.5">{toast.sub}</div>}
