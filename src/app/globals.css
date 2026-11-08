@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+/* ───────────── DREAMSCAPE design tokens (see DESIGN_SYSTEM.md) ───────────── */
+@theme {
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-serif), ui-serif, Georgia, serif;
+
+  --color-canvas: var(--ds-canvas);
+  --color-surface: var(--ds-surface);
+  --color-surface-2: var(--ds-surface-2);
+  --color-ink: var(--ds-ink);
+  --color-muted: var(--ds-muted);
+  --color-line: var(--ds-line);
+
+  --color-primary: var(--ds-primary);
+  --color-primary-ink: var(--ds-primary-ink);
+  --color-primary-soft: var(--ds-primary-soft);
+  --color-sage: var(--ds-sage);
+  --color-sage-soft: var(--ds-sage-soft);
+  --color-lavender: var(--ds-lavender);
+  --color-lavender-soft: var(--ds-lavender-soft);
+  --color-gold: var(--ds-gold);
+  --color-gold-soft: var(--ds-gold-soft);
+  --color-danger: var(--ds-danger);
+
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.75rem;
+
+  --shadow-soft: 0 1px 2px rgb(58 48 43 / 0.04), 0 8px 24px -8px rgb(58 48 43 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(58 48 43 / 0.05), 0 18px 40px -12px rgb(58 48 43 / 0.22);
+
+  --animate-float: float 6s ease-in-out infinite;
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+}
+
+:root {
+  --ds-canvas: #fbf7f2;
+  --ds-surface: #fffdfa;
+  --ds-surface-2: #f5eee6;
+  --ds-ink: #3a302b;
+  --ds-muted: #7a6e66;
+  --ds-line: #ece2d7;
+  --ds-primary: #d9704f;
+  --ds-primary-ink: #ffffff;
+  --ds-primary-soft: #fbe3d3;
+  --ds-sage: #5f8a6a;
+  --ds-sage-soft: #e4ebd9;
+  --ds-lavender: #7a6fa8;
+  --ds-lavender-soft: #ece6f4;
+  --ds-gold: #c99a2e;
+  --ds-gold-soft: #f8edcf;
+  --ds-danger: #b4483a;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ds-canvas: #1d1917;
+    --ds-surface: #262120;
+    --ds-surface-2: #2f2927;
+    --ds-ink: #f3ebe4;
+    --ds-muted: #b3a79e;
+    --ds-line: #3d3532;
+    --ds-primary: #ec8f6f;
+    --ds-primary-ink: #1d1917;
+    --ds-primary-soft: #4a2f26;
+    --ds-sage: #9cc3a5;
+    --ds-sage-soft: #2c3a2f;
+    --ds-lavender: #b9aee0;
+    --ds-lavender-soft: #34304a;
+    --ds-gold: #e9c46a;
+    --ds-gold-soft: #3e3522;
+    --ds-danger: #f0907f;
+    color-scheme: dark;
+  }
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--ds-canvas);
+  color: var(--ds-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ds-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.paper-grain {
+  background-image: radial-gradient(rgb(58 48 43 / 0.035) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+input[type="range"] {
+  accent-color: var(--ds-primary);
+}
