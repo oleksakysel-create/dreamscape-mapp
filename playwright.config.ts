@@ -1,29 +1,19 @@
-import { defineConfig, devices } from "@playwright/test";
-
-const PORT = Number(process.env.E2E_PORT ?? 3100);
+import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
-  testDir: "./e2e",
-  timeout: 120_000,
-  expect: { timeout: 10_000 },
-  fullyParallel: false,
-  retries: process.env.CI ? 1 : 0,
-  reporter: [["list"], ["html", { open: "never" }]],
-  use: {
-    baseURL: `http://localhost:${PORT}`,
-    trace: "off",
-    screenshot: "only-on-failure",
-  },
+  testDir: './e2e',
+  timeout: 90_000,
+  expect: { timeout: 8_000 },
+  reporter: [['list']],
+  use: { baseURL: 'http://localhost:4173', trace: 'off', screenshot: 'only-on-failure' },
   projects: [
-    { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1360, height: 900 } }, grepInvert: /@mobile/ },
-    { name: "mobile", use: { ...devices["Pixel 7"] }, grep: /@mobile/ },
+    { name: 'iphone', use: { ...devices['iPhone 13 Pro'], browserName: 'chromium' }, grepInvert: /@desktop/ },
+    { name: 'desktop', use: { viewport: { width: 1280, height: 960 } }, grep: /@desktop/ },
   ],
   webServer: {
-    // Production build for realistic performance; reuse a running server locally.
-    command: `npm run build && npx next start -p ${PORT}`,
-    url: `http://localhost:${PORT}`,
+    command: 'npm run build && npx vite preview --port 4173 --strictPort',
+    url: 'http://localhost:4173',
     reuseExistingServer: !process.env.CI,
-    timeout: 300_000,
-    env: { NEXT_TELEMETRY_DISABLED: "1" },
+    timeout: 180_000,
   },
-});
+})

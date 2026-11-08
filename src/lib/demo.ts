@@ -1,88 +1,68 @@
-import { newlyEarned } from "@/lib/achievements";
-import { getIllustration } from "@/lib/coloring/illustrations";
-import { PALETTES } from "@/lib/coloring/palettes";
-import type { Fills } from "@/lib/coloring/types";
-import { MONTHS } from "@/lib/data/months";
-import { initialData } from "@/lib/store/initial";
-import type { JourneyData, Scores } from "@/lib/store/types";
+import { getArtwork } from '../art'
+import { THEMES } from '../data/themes'
+import { addDays, startOfWeek, ymd } from './dates'
+import type { Step } from './planner'
+import type { Data } from './store'
 
-function paletteFill(imageId: string, paletteIndex: number, ratio = 1): Fills {
-  const ill = getIllustration(imageId);
-  if (!ill) return {};
-  const colors = PALETTES[paletteIndex % PALETTES.length]!.colors;
-  const count = Math.round(ill.regions.length * ratio);
-  return Object.fromEntries(ill.regions.slice(0, count).map((r, i) => [r.id, colors[(i * 3) % colors.length]!]));
+const realistic = (art: string, share = 1) => {
+  const a = getArtwork(art)
+  const n = Math.round(a.regions.length * share)
+  return Object.fromEntries(a.regions.slice(0, n).map((r) => [r.id, r.tone]))
 }
 
-const iso = (d: Date) => d.toISOString();
-const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-
-/** A realistic, mid-journey persona so reviewers can explore every screen instantly. */
-export function buildDemoJourney(today = new Date()): JourneyData {
-  const start = new Date(today.getFullYear(), today.getMonth() - 2, 1);
-  const day = (m: number, d: number) => new Date(start.getFullYear(), start.getMonth() + m - 1, d, 10, 0);
-
-  const first: Scores = { health: 4, mind: 5, relationships: 6, family: 7, love: 6, career: 5, finances: 4, growth: 6, fun: 3, home: 6, community: 4, purpose: 5 };
-  const latest: Scores = { ...first, health: 6, mind: 6, fun: 5, finances: 5, growth: 7 };
-
-  const data: JourneyData = {
-    ...initialData(),
-    mode: "demo",
-    profile: { name: "Alex", identity: "Explorer", pronouns: "they/them", ageRange: "25–34", journeyStart: ymd(start) },
-    onboardedAt: iso(day(1, 1)),
-    assessments: [
-      { id: "as_demo_1", takenAt: iso(day(1, 1)), scores: first },
-      { id: "as_demo_2", takenAt: iso(day(3, 1)), scores: latest },
-    ],
-    priorities: {
-      health: "focus", fun: "focus", growth: "focus",
-      mind: "maintain", family: "maintain", relationships: "maintain", career: "maintain", finances: "maintain",
-      love: "backlog", home: "backlog", community: "backlog", purpose: "backlog",
-    },
-    goals: {
-      health: { sphereId: "health", title: "Move my body 3 times a week", why: "I want to feel strong and rested.", firstStep: "Morning walk on Mondays", updatedAt: iso(day(1, 1)) },
-      fun: { sphereId: "fun", title: "Pick up watercolor painting again", why: "Creating makes me feel like me.", firstStep: "Buy a small travel set", updatedAt: iso(day(1, 1)) },
-      growth: { sphereId: "growth", title: "Read 12 books this year", why: "Curiosity keeps me alive.", firstStep: "Library card renewal", updatedAt: iso(day(1, 1)) },
-    },
-    reflections: {
+/** A believable mid-journey: two chapters done, the third in progress. */
+export function demoData(today = new Date()): Data {
+  const start = ymd(new Date(today.getFullYear(), today.getMonth() - 2, 1))
+  const wk = startOfWeek(today)
+  const iso = (d: Date) => d.toISOString()
+  const past = (days: number) => iso(addDays(today, -days))
+  const t = (m: number) => THEMES[m - 1]!
+  const step = (s: Partial<Step> & Pick<Step, 'id' | 'month' | 'title' | 'minutes'>): Step => ({
+    horizon: 'week', status: 'planned', createdAt: past(20), ...s,
+  })
+  return {
+    demo: true,
+    realisticBrush: false,
+    profile: { name: 'Анна', start, weeklyMinutes: 240, windows: ['wd-morning', 'wd-evening', 'we-morning'] },
+    chapters: {
       1: {
-        month: 1,
         answers: {
-          "m1-q1": "I need more rest and less scrolling at night. I feel tired but hopeful.",
-          "m1-q2": "I would walk to work twice a week and sleep before midnight.",
-          "m1-q3": "7",
+          [t(1).questions[0]!.id]: 'Работа с 9 до 19, дорога, ужин, дети. Моё — только утренний кофе в тишине.',
+          [t(1).questions[1]!.id]: 'Светлый дом у моря, панорамные окна, терраса и бассейн. Утром — солнце на кухне.',
+          [t(1).questions[2]!.id]: '4',
+          [t(1).questions[3]!.id]: 'Собрать подборку домов и посчитать бюджет',
         },
-        updatedAt: iso(day(1, 5)),
-        completedAt: iso(day(1, 5)),
-        summary: { headline: "There's a warm, hopeful light in your words, circling around health & energy.", themes: ["health"], mood: "bright", keyPhrase: "I would walk to work twice a week and sleep before midnight.", wordCount: 28, generatedBy: "local-heuristic-v1", createdAt: iso(day(1, 5)) },
+        reflectedAt: past(58),
+        closingNote: 'Поняла, что мечта реальнее, чем казалось: нужен план на 6 лет.',
+        fills: realistic('villa'),
+        coloredAt: past(40),
       },
       2: {
-        month: 2,
         answers: {
-          "m2-q1": "Making tea and reading a few pages of a book before bed.",
-          "m2-q2": "My sister, who always calls on Sundays. I would thank her for her patience.",
-          "m2-q3": "6",
+          [t(2).questions[0]!.id]: 'В горах, в прошлом сентябре. Без ноутбука и новостей.',
+          [t(2).questions[1]!.id]: 'Вечерние рабочие чаты и поздний сон.',
+          [t(2).questions[2]!.id]: '5',
+          [t(2).questions[3]!.id]: 'Ложиться до 23:00',
         },
-        updatedAt: iso(day(2, 8)),
-        completedAt: iso(day(2, 8)),
-        summary: { headline: "Your words feel grounded and honest, circling around family and learning & growth.", themes: ["family", "growth"], mood: "steady", keyPhrase: "My sister, who always calls on Sundays.", wordCount: 26, generatedBy: "local-heuristic-v1", createdAt: iso(day(2, 8)) },
+        reflectedAt: past(28),
+        fills: realistic('retreat'),
+        coloredAt: past(12),
       },
-      3: { month: 3, answers: { "m3-q1": "Pottery, maybe." }, updatedAt: iso(day(3, 2)) },
+      3: {
+        answers: {
+          [t(3).questions[0]!.id]: 'Спокойно выбрать отпуск, не глядя на цену.',
+          [t(3).questions[1]!.id]: 'Доставка еды и подписки, которыми не пользуюсь.',
+        },
+        fills: realistic('watch', 0.35),
+      },
     },
-    actions: [
-      { id: "act_demo_1", month: 1, title: "Morning walk around the park", sphereId: "health", date: ymd(day(1, 8)), time: "07:30", reminder: true, reminderMinutesBefore: 15, notifiedAt: iso(day(1, 8)), doneAt: iso(day(1, 8)), createdAt: iso(day(1, 5)) },
-      { id: "act_demo_2", month: 2, title: "Library visit & pick two books", sphereId: "growth", date: ymd(day(2, 12)), time: "17:00", reminder: true, reminderMinutesBefore: 30, notifiedAt: iso(day(2, 12)), doneAt: iso(day(2, 12)), createdAt: iso(day(2, 8)) },
-      { id: "act_demo_3", month: 3, title: "Try a beginner watercolor class", sphereId: "fun", date: ymd(new Date(today.getTime() + 5 * 86400_000)), time: "18:30", reminder: true, reminderMinutesBefore: 60, createdAt: iso(day(3, 2)) },
+    steps: [
+      step({ id: 'd1', month: 1, title: 'Собрать подборку домов и посчитать бюджет', minutes: 60, date: ymd(addDays(wk, -50)), window: 'we-morning', status: 'done', result: 'Нашла три района, бюджет ясен.', doneAt: past(50) }),
+      step({ id: 'd2', month: 2, title: 'Ложиться до 23:00 три вечера', minutes: 30, date: ymd(addDays(wk, -20)), window: 'wd-evening', status: 'partly', result: 'Получилось два вечера из трёх.', doneAt: past(20) }),
+      step({ id: 'd3', month: 2, title: 'Забронировать выходные без телефона', minutes: 45, date: ymd(addDays(wk, -15)), window: 'we-morning', status: 'done', result: 'Домик в Карелии на май.', doneAt: past(15) }),
+      step({ id: 'd4', month: 3, title: 'Разобрать подписки и регулярные траты', minutes: 45, date: ymd(addDays(wk, 1)), window: 'wd-evening' }),
+      step({ id: 'd5', month: 3, title: 'Открыть отдельный счёт «Мечта»', minutes: 30, date: ymd(addDays(wk, 5)), window: 'we-morning' }),
+      step({ id: 'd6', month: 3, title: 'Настроить автоперевод в день зарплаты', minutes: 15, horizon: 'month' }),
     ],
-    colorings: {
-      1: { month: 1, imageId: "nature-dawn", fills: paletteFill("nature-dawn", 0), startedAt: iso(day(1, 6)), updatedAt: iso(day(1, 9)), completedAt: iso(day(1, 9)) },
-      2: { month: 2, imageId: "bot-lotus", fills: paletteFill("bot-lotus", 1), startedAt: iso(day(2, 9)), updatedAt: iso(day(2, 14)), completedAt: iso(day(2, 14)) },
-      3: { month: 3, imageId: "mandala-sunrise", fills: paletteFill("mandala-sunrise", 3, 0.4), startedAt: iso(day(3, 2)), updatedAt: iso(day(3, 2)) },
-    },
-  };
-  const at = iso(day(2, 14));
-  for (const id of newlyEarned(data)) data.achievements[id] = at;
-  return data;
+  }
 }
-
-export const DEMO_CHAPTER_COUNT = MONTHS.length;

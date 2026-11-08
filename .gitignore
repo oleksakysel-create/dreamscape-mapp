@@ -1,13 +1,9 @@
 node_modules/
-.next/
-out/
+dist/
+release/
 coverage/
 test-results/
 playwright-report/
 *.tsbuildinfo
-next-env.d.ts
-.env
-.env.local
-.env*.local
 .DS_Store
-dreamscape.zip
+*.zip
