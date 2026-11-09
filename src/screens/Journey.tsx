@@ -4,7 +4,7 @@ import { cx, LargeTitle } from '../components/ui'
 import { THEMES } from '../data/themes'
 import { chapterFor, chapterMonthName } from '../lib/dates'
 import { usePhoto } from '../lib/photos'
-import { chapterOf, chapterStages, phraseOf, useStore } from '../lib/store'
+import { chapterOf, chapterStages, dreamOf, phraseOf, useStore } from '../lib/store'
 import { useUI } from '../lib/ui'
 
 function Thumb({ month }: { month: number }) {
@@ -52,7 +52,7 @@ export default function Journey() {
                     )}
                   </span>
                   <span className="block text-[17px] font-semibold tracking-tight mt-0.5">{t.title}</span>
-                  <span className="block text-[13px] text-mute truncate">{phrase ? `“${phrase}”` : t.dream}</span>
+                  <span className="block text-[13px] text-mute truncate">{phrase ? `“${phrase}”` : dreamOf(data, t.month)}</span>
                 </span>
                 <span className="flex flex-col items-end gap-2">
                   <span className="flex gap-1" aria-label={`${[st.thoughts, st.plan, st.create, st.result].filter(Boolean).length} of 4 stages`}>

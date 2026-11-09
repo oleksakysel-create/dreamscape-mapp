@@ -6,7 +6,7 @@ import { deletePhoto, photoBlob, savePhoto } from '../lib/photos'
 import { findSlot, weekSlots, windowOf, type Horizon, type StepStatus, type WindowId } from '../lib/planner'
 import { FORMATS, renderShare, shareImage, type ShareFormat } from '../lib/share'
 import { chapterMonthName } from '../lib/dates'
-import { chapterOf, phraseOf, useStore } from '../lib/store'
+import { chapterOf, dreamOf, phraseOf, useStore } from '../lib/store'
 import { haptic, useUI } from '../lib/ui'
 import { Button, cx, Eyebrow, Segmented, Sheet } from './ui'
 
@@ -196,7 +196,7 @@ function StepSheet({ id, onClose }: { id: string; onClose: () => void }) {
 }
 
 function AttachSheet({ month, onClose }: { month: number; onClose: () => void }) {
-  const theme = getTheme(month)!
+  const dream = useStore((s) => dreamOf(s, month))
   const chapter = useStore((s) => chapterOf(s, month))
   const fulfill = useStore((s) => s.fulfill)
   const notify = useUI((s) => s.notify)
@@ -231,7 +231,7 @@ function AttachSheet({ month, onClose }: { month: number; onClose: () => void })
       }
       fulfill(month, { date: parseYmd(date).toISOString(), photo, memo: memo.trim() || undefined })
       haptic(30)
-      notify('It came true', `${theme.dream} is now on your board`)
+      notify('It came true', `${dream} is now on your board`)
       onClose()
     } catch {
       notify('Couldn’t save the photo', 'Try another image')
@@ -242,7 +242,7 @@ function AttachSheet({ month, onClose }: { month: number; onClose: () => void })
 
   return (
     <div className="space-y-5 pb-2">
-      <p className="text-[14px] leading-relaxed text-mute -mt-1">Add a real photo — it becomes the cover of “{theme.dream}” on your board.</p>
+      <p className="text-[14px] leading-relaxed text-mute -mt-1">Add a real photo — it becomes the cover of “{dream}” on your board.</p>
       <input ref={library} type="file" accept="image/*" className="hidden" onChange={onPick} data-testid="photo-input" />
       <input ref={camera} type="file" accept="image/*" capture="environment" className="hidden" onChange={onPick} />
       {preview ? (
@@ -314,7 +314,7 @@ function ShareSheet({ month }: { month: number }) {
       const photo = chapter.fulfilledAt && chapter.photo ? await photoBlob(chapter.photo).catch(() => null) : null
       const b = await renderShare({
         format,
-        dream: theme.dream,
+        dream: dreamOf(data, month),
         phrase,
         meta: `My dream · ${chapterMonthName(data.profile!.start, month)}`,
         photo,
@@ -324,7 +324,7 @@ function ShareSheet({ month }: { month: number }) {
     return () => {
       alive = false
     }
-  }, [format, chapter.fulfilledAt, chapter.photo, phrase, theme.dream, data.profile, month])
+  }, [format, chapter.fulfilledAt, chapter.photo, phrase, data, month])
 
   useEffect(() => {
     if (!blob) return
@@ -336,7 +336,7 @@ function ShareSheet({ month }: { month: number }) {
   const f = FORMATS[format]
   const go = async () => {
     if (!blob) return
-    const r = await shareImage(blob, `dreamscape-${theme.art}-${format}.png`, theme.dream)
+    const r = await shareImage(blob, `dreamscape-${theme.art}-${format}.png`, dreamOf(data, month))
     if (r === 'downloaded') notify('Image saved', 'Find it in your downloads')
   }
 

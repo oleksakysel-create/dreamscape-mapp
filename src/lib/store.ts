@@ -17,6 +17,8 @@ export interface Chapter {
   closingNote?: string
   fills: Record<string, string>
   coloredAt?: string
+  /** The person's own name for this chapter's dream (defaults to the theme's) */
+  title?: string
   /** The dream came true */
   fulfilledAt?: string
   /** "idb:<key>" or a URL */
@@ -176,6 +178,9 @@ export function nextStage(d: Pick<Data, 'chapters' | 'steps'>, month: number): S
 }
 
 export const isFulfilled = (d: Pick<Data, 'chapters'>, month: number) => Boolean(chapterOf(d, month).fulfilledAt)
+
+/** Name of the chapter's dream: the person's own, or the theme's. */
+export const dreamOf = (d: Pick<Data, 'chapters'>, month: number) => chapterOf(d, month).title?.trim() || THEMES[month - 1]!.dream
 
 /** The dream in the person's own words (empty until they write it). */
 export function phraseOf(d: Pick<Data, 'chapters'>, month: number) {

@@ -51,9 +51,9 @@ function WeekVisual() {
 function PhotoVisual() {
   return (
     <div className="w-[240px] rotate-2">
-      <img src="./demo/sea.jpg" alt="" className="w-full aspect-[4/5] object-cover rounded-[24px] shadow-[0_30px_60px_rgba(0,0,0,0.55)]" />
+      <img src="./demo/beach.jpg" alt="" className="w-full aspect-[4/5] object-cover rounded-[24px] shadow-[0_30px_60px_rgba(0,0,0,0.55)]" />
       <div className="mt-3 flex items-center justify-between px-1">
-        <span className="text-[17px] font-semibold">Islands</span>
+        <span className="text-[17px] font-semibold">Madeira</span>
         <span className="text-[12px] font-semibold text-sage">Came true</span>
       </div>
     </div>

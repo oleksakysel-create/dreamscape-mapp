@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import { fileURLToPath } from 'node:url'
 
-const PHOTO = fileURLToPath(new URL('../public/demo/sea.jpg', import.meta.url))
+const PHOTO = fileURLToPath(new URL('../public/demo/beach.jpg', import.meta.url))
 
 function watch(page: Page) {
   const errors: string[] = []
@@ -122,14 +122,14 @@ test('example journey opens every screen without errors', async ({ page }) => {
   await page.getByTestId('onb-demo').click()
   await expect(page.getByRole('heading', { name: 'Today' })).toBeVisible()
   await page.getByRole('button', { name: 'Journey' }).click()
-  await page.getByTestId('chapter-2').click()
+  await page.getByTestId('chapter-6').click()
   await expect(page.getByTestId('dream-card')).toHaveAttribute('data-state', 'fulfilled')
   await page.getByTestId('chapter-share').click()
   await expect(page.getByTestId('share-preview')).toBeVisible()
   await page.mouse.click(10, 60)
   await page.getByTestId('nav-back').click()
   await page.getByRole('button', { name: 'Board' }).click()
-  await expect(page.getByTestId('board-2')).toHaveAttribute('data-fulfilled', 'true')
+  for (const m of [4, 6, 9]) await expect(page.getByTestId(`board-${m}`)).toHaveAttribute('data-fulfilled', 'true')
   await page.getByRole('button', { name: 'Today' }).click()
   await page.getByRole('button', { name: 'Profile' }).click()
   await page.getByTestId('reset').click()

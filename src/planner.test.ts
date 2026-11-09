@@ -83,10 +83,16 @@ describe('dream card logic', () => {
     expect(isFulfilled(useStore.getState(), 1)).toBe(false)
   })
 
-  it('demo journey has one dream that came true with a photo', async () => {
+  it('example journey has three dreams that came true, each with a photo', async () => {
     const { demoData } = await import('./lib/demo')
+    const { chapterFor } = await import('./lib/dates')
     const d = demoData()
-    expect(d.chapters[2]!.fulfilledAt).toBeTruthy()
-    expect(d.chapters[2]!.photo).toMatch(/demo\/mountains\.jpg$/)
+    expect(chapterFor(d.profile!.start)).toBe(10)
+    const fulfilled = Object.entries(d.chapters).filter(([, c]) => c.fulfilledAt)
+    expect(fulfilled.map(([m]) => Number(m))).toEqual([4, 6, 9])
+    for (const [, c] of fulfilled) {
+      expect(c.photo).toMatch(/^\.\/demo\/.+\.jpg$/)
+      expect(new Date(c.fulfilledAt!).getTime()).toBeLessThanOrEqual(Date.now())
+    }
   })
 })

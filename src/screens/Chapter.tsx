@@ -6,7 +6,7 @@ import { Button, cx, Eyebrow, NavBar, UnderlineTabs } from '../components/ui'
 import { getTheme } from '../data/themes'
 import { chapterMonthLong } from '../lib/dates'
 import { WINDOWS } from '../lib/planner'
-import { chapterOf, chapterStages, nextStage, STAGES, useStore, type StageId } from '../lib/store'
+import { chapterOf, chapterStages, dreamOf, nextStage, STAGES, useStore, type StageId } from '../lib/store'
 import { haptic, useUI } from '../lib/ui'
 import { StepRow } from './Today'
 
@@ -263,7 +263,7 @@ export default function Chapter({ month, back, onBack }: { month: number; back: 
       <NavBar
         back={back}
         onBack={onBack}
-        title={theme.dream}
+        title={dreamOf(data, month)}
         right={
           <button aria-label="Share" onClick={() => ui.openSheet({ type: 'share', month })} className="w-11 h-11 flex items-center justify-center text-sky" data-testid="chapter-share">
             <Share size={21} strokeWidth={1.9} />
