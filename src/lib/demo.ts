@@ -99,6 +99,7 @@ export function demoData(today = new Date()): Data {
         answers: {
           [q(10, 0)]: 'Time. I’d take one whole weekday a month just for myself.',
           [q(10, 1)]: 'Flying anywhere I like, whenever I like.',
+          [q(10, 3)]: 'One spontaneous trip a year — booked on a Friday, gone by Saturday.',
         },
         fills: partial('jet', 0.3),
       },
