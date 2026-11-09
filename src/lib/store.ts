@@ -17,6 +17,11 @@ export interface Chapter {
   closingNote?: string
   fills: Record<string, string>
   coloredAt?: string
+  /** The dream came true */
+  fulfilledAt?: string
+  /** "idb:<key>" or a URL */
+  photo?: string
+  memo?: string
 }
 
 export interface Data {
@@ -50,6 +55,8 @@ interface Actions {
   setClosingNote: (month: number, note: string) => void
   setFills: (month: number, fills: Record<string, string>) => void
   completeColoring: (month: number) => void
+  fulfill: (month: number, f: { date: string; photo?: string; memo?: string }) => void
+  unfulfill: (month: number) => void
   setRealisticBrush: (v: boolean) => void
   load: (d: Data) => void
   reset: () => void
@@ -107,14 +114,16 @@ export const useStore = create<Data & Actions>()(
         setClosingNote: (month, closingNote) => patchChapter(month, { closingNote }),
         setFills: (month, fills) => patchChapter(month, { fills }),
         completeColoring: (month) => patchChapter(month, { coloredAt: get().chapters[month]?.coloredAt ?? now() }),
+        fulfill: (month, f) => patchChapter(month, { fulfilledAt: f.date, photo: f.photo ?? chapterOf(get(), month).photo, memo: f.memo }),
+        unfulfill: (month) => patchChapter(month, { fulfilledAt: undefined, photo: undefined, memo: undefined }),
         setRealisticBrush: (realisticBrush) => set({ realisticBrush }),
         load: (d) => set({ ...empty(), ...d }),
         reset: () => set(empty()),
       }
     },
     {
-      name: 'dreamscape-v2',
-      version: 2,
+      name: 'dreamscape-v3',
+      version: 3,
       storage: createJSONStorage(() => localStorage),
       partialize: ({ profile, chapters, steps, realisticBrush, demo }) => ({ profile, chapters, steps, realisticBrush, demo }),
     },
@@ -134,36 +143,44 @@ export function coloringProgress(d: Pick<Data, 'chapters'>, month: number) {
   return art.regions.filter((r) => fills[r.id]).length / art.regions.length
 }
 
-export type StageId = 'reflect' | 'plan' | 'results' | 'color'
+export type StageId = 'thoughts' | 'plan' | 'create' | 'result'
+export const STAGES: { id: StageId; label: string }[] = [
+  { id: 'thoughts', label: 'Thoughts' },
+  { id: 'plan', label: 'Plan' },
+  { id: 'create', label: 'Create' },
+  { id: 'result', label: 'Result' },
+]
 
-/** Where the user is in a chapter. Plan/results are encouraged, never required. */
+/** Where the user is in a chapter. Nothing is mandatory; this only guides the next suggestion. */
 export function chapterStages(d: Pick<Data, 'chapters' | 'steps'>, month: number) {
   const c = chapterOf(d, month)
   const steps = d.steps.filter((s) => s.month === month)
-  const logged = steps.filter((s) => s.status !== 'planned').length
+  const done = steps.filter((s) => s.status === 'done' || s.status === 'partly').length
   return {
-    reflect: Boolean(c.reflectedAt),
+    thoughts: Boolean(c.reflectedAt),
     plan: steps.length > 0,
-    results: steps.length > 0 && logged === steps.length,
-    color: Boolean(c.coloredAt),
+    create: done > 0,
+    result: Boolean(c.fulfilledAt),
     steps: steps.length,
-    logged,
+    done,
     coloring: coloringProgress(d, month),
   }
 }
 
-export function nextStage(d: Pick<Data, 'chapters' | 'steps'>, month: number): StageId | null {
+export function nextStage(d: Pick<Data, 'chapters' | 'steps'>, month: number): StageId {
   const s = chapterStages(d, month)
-  if (!s.reflect) return 'reflect'
+  if (!s.thoughts) return 'thoughts'
   if (!s.plan) return 'plan'
-  if (!s.color) return 'color'
-  if (!s.results) return 'results'
-  return null
+  if (!s.create) return 'create'
+  return 'result'
 }
 
-export const isChapterComplete = (d: Pick<Data, 'chapters' | 'steps'>, month: number) => {
-  const s = chapterStages(d, month)
-  return s.reflect && s.color
+export const isFulfilled = (d: Pick<Data, 'chapters'>, month: number) => Boolean(chapterOf(d, month).fulfilledAt)
+
+/** The dream in the person's own words (empty until they write it). */
+export function phraseOf(d: Pick<Data, 'chapters'>, month: number) {
+  const t = THEMES[month - 1]!
+  return (chapterOf(d, month).answers[t.dreamQuestion] ?? '').trim()
 }
 
 export const firstOfMonth = (d = new Date()) => ymd(new Date(d.getFullYear(), d.getMonth(), 1))

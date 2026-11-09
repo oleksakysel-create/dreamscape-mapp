@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "type": "module",
   "productName": "Dreamscape",
-  "description": "Dreamscape — мечты, вписанные в реальную жизнь",
+  "description": "Dreamscape — dreams, fitted into real life",
   "author": "Dreamscape",
   "main": "electron/main.cjs",
   "engines": {

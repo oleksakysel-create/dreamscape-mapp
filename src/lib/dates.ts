@@ -14,19 +14,28 @@ export function startOfWeek(d: Date) {
 }
 export const isWeekend = (d: Date) => d.getDay() === 0 || d.getDay() === 6
 
-export const DAY_SHORT = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
-const MONTHS_GEN = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря']
-const MONTHS_NOM = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
+export const DAY_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+const MON = MONTHS.map((m) => m.slice(0, 3))
 
 export const dayShort = (d: Date) => DAY_SHORT[(d.getDay() + 6) % 7]!
-export const dayLabel = (d: Date) => `${dayShort(d)}, ${d.getDate()} ${MONTHS_GEN[d.getMonth()]}`
-export const dateLabel = (d: Date) => `${d.getDate()} ${MONTHS_GEN[d.getMonth()]}`
+/** "Tue, Nov 10" */
+export const dayLabel = (d: Date) => `${dayShort(d)}, ${MON[d.getMonth()]} ${d.getDate()}`
+/** "Nov 10, 2026" */
+export const dateLabel = (d: Date) => `${MON[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
+/** "Monday, November 9" */
+export const longDay = (d: Date) => `${d.toLocaleDateString('en-US', { weekday: 'long' })}, ${MONTHS[d.getMonth()]} ${d.getDate()}`
 
-/** Calendar month name for chapter N given the journey start (YYYY-MM-01). */
+/** "Nov 2026" for chapter N given the journey start (YYYY-MM-01). */
 export function chapterMonthName(start: string, chapter: number) {
   const s = parseYmd(start)
   const d = new Date(s.getFullYear(), s.getMonth() + chapter - 1, 1)
-  return `${MONTHS_NOM[d.getMonth()]} ${d.getFullYear()}`
+  return `${MON[d.getMonth()]} ${d.getFullYear()}`
+}
+export function chapterMonthLong(start: string, chapter: number) {
+  const s = parseYmd(start)
+  const d = new Date(s.getFullYear(), s.getMonth() + chapter - 1, 1)
+  return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`
 }
 
 /** 1-based chapter for today, clamped to 1..12. */
@@ -39,14 +48,14 @@ export function chapterFor(start: string, now = new Date()) {
 export function minutesLabel(min: number) {
   const h = Math.floor(min / 60)
   const m = min % 60
-  if (!h) return `${m} мин`
-  return m ? `${h} ч ${m} мин` : `${h} ч`
+  if (!h) return `${m} min`
+  return m ? `${h} h ${m} min` : `${h} h`
 }
 
 export function greeting(now = new Date()) {
   const h = now.getHours()
-  if (h < 5) return 'Доброй ночи'
-  if (h < 12) return 'Доброе утро'
-  if (h < 18) return 'Добрый день'
-  return 'Добрый вечер'
+  if (h < 5) return 'Good night'
+  if (h < 12) return 'Good morning'
+  if (h < 18) return 'Good afternoon'
+  return 'Good evening'
 }

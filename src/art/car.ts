@@ -54,5 +54,5 @@ export function car() {
     p.add(sector(cx, cy, 10, 14, 200, 240), '#E3B23C')
     p.add(circle(cx, cy, 4), '#9AA0A7')
   }
-  return p.done('car', 'Спорткар')
+  return p.done('car', 'Sports car')
 }

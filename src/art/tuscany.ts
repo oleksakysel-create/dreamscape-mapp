@@ -36,5 +36,5 @@ export function tuscany() {
     p.add(poly([[top(a), 268], [top(b), 268], [b, 400], [a, 400]]), i % 4 ? '#5D8A3F' : '#4F7A36')
   }
   for (const [x, y] of [[40, 372], [70, 384], [236, 370], [262, 386]] as const) p.add(ellipse(x, y, 6, 9), '#5A2A4A')
-  return p.done('tuscany', 'Виноградник')
+  return p.done('tuscany', 'Vineyard')
 }

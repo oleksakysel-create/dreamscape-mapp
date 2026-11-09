@@ -85,7 +85,7 @@ export const ColorCanvas = forwardRef<CanvasHandle, Props>(function ColorCanvas(
       ref={box}
       data-testid="canvas"
       data-zoom={view.k.toFixed(2)}
-      className="relative w-full touch-none select-none overflow-hidden rounded-[22px] bg-white"
+      className="relative w-full touch-none select-none overflow-hidden rounded-[6px] bg-white"
       style={{ aspectRatio: `${vbW} / ${vbH}` }}
       onPointerDown={(e) => {
         pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
@@ -129,7 +129,7 @@ export const ColorCanvas = forwardRef<CanvasHandle, Props>(function ColorCanvas(
         if (id) onTap(id)
       }}
     >
-      <svg viewBox={art.viewBox} className="block w-full h-full" role="img" aria-label={`Раскраска: ${art.title}`}>
+      <svg viewBox={art.viewBox} className="block w-full h-full" role="img" aria-label={`Coloring sheet: ${art.title}`}>
         <g transform={`translate(${view.x} ${view.y}) scale(${view.k})`}>
           {art.regions.map((r) => (
             <RegionPath key={r.id} id={r.id} d={r.d} eo={r.eo} fill={fills[r.id]} hint={peek ? r.tone : undefined} />

@@ -39,5 +39,5 @@ export function aurora() {
   }
   p.add(poly([[128, 330], [172, 330], [170, 346], [130, 346]]), '#C9D5E3')
   p.add(poly([[142, 312], [158, 312], [158, 330], [142, 330]]), '#3E4A5A')
-  return p.done('aurora', 'Северное сияние')
+  return p.done('aurora', 'Northern lights')
 }

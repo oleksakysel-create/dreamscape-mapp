@@ -57,5 +57,5 @@ export function villa() {
   p.add(band(wave(372, 4, 1.5), flat(400)), '#3E6634')
   p.add(ellipse(10, 352, 22, 30), '#2E5235')
   p.add(ellipse(292, 350, 22, 32), '#2E5235')
-  return p.done('villa', 'Дом мечты')
+  return p.done('villa', 'Dream home')
 }

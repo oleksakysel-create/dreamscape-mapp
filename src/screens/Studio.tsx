@@ -114,24 +114,24 @@ export default function Studio({ month, onClose }: { month: number; onClose: () 
       transition={{ type: 'spring', stiffness: 380, damping: 40 }}
     >
       <div className="px-4 pt-[max(54px,calc(env(safe-area-inset-top)+8px))] pb-3 flex items-center gap-3">
-        <button onClick={close} aria-label="Закрыть" className="w-10 h-10 rounded-full bg-white/[0.07] flex items-center justify-center">
+        <button onClick={close} aria-label="Close" className="w-10 h-10 rounded-full bg-white/[0.07] flex items-center justify-center">
           <X size={20} />
         </button>
         <div className="flex-1 min-w-0">
-          <Eyebrow className="text-gold">Глава {month}</Eyebrow>
-          <div className="serif text-[24px] leading-tight truncate">{theme.dream}</div>
+          <Eyebrow className="text-sky">Pause · chapter {month}</Eyebrow>
+          <div className="text-[20px] font-semibold tracking-tight leading-tight truncate">{theme.dream}</div>
         </div>
-        <button onClick={undo} disabled={!past.length} aria-label="Отменить" className="w-10 h-10 rounded-full bg-white/[0.07] flex items-center justify-center disabled:opacity-30">
+        <button onClick={undo} disabled={!past.length} aria-label="Undo" className="w-10 h-10 rounded-full bg-white/[0.07] flex items-center justify-center disabled:opacity-30">
           <Undo2 size={18} />
         </button>
-        <button onClick={redo} disabled={!future.length} aria-label="Повторить" className="w-10 h-10 rounded-full bg-white/[0.07] flex items-center justify-center disabled:opacity-30">
+        <button onClick={redo} disabled={!future.length} aria-label="Redo" className="w-10 h-10 rounded-full bg-white/[0.07] flex items-center justify-center disabled:opacity-30">
           <Redo2 size={18} />
         </button>
       </div>
 
       <div className="px-4">
         <div className="h-1 rounded-full bg-white/10 overflow-hidden">
-          <motion.div className="h-full bg-gold" animate={{ width: `${progress * 100}%` }} />
+          <motion.div className="h-full bg-sky" animate={{ width: `${progress * 100}%` }} />
         </div>
         <div className="flex justify-between text-[12px] text-mute mt-1.5 tnum">
           <span data-testid="progress">
@@ -153,10 +153,10 @@ export default function Studio({ month, onClose }: { month: number; onClose: () 
             onPointerDown={() => setPeek(true)}
             onPointerUp={() => setPeek(false)}
             onPointerLeave={() => setPeek(false)}
-            className={cx('h-10 px-3 rounded-full text-[13px] font-semibold flex items-center gap-1.5', peek ? 'bg-gold text-[#17130C]' : 'bg-white/[0.07]')}
-            aria-label="Удерживайте, чтобы увидеть эталон"
+            className={cx('h-10 px-3 rounded-full text-[13px] font-semibold flex items-center gap-1.5', peek ? 'bg-sky text-[#0B1622]' : 'bg-white/[0.07]')}
+            aria-label="Hold to peek at the reference"
           >
-            <Eye size={16} /> Эталон
+            <Eye size={16} /> Peek
           </button>
           <button
             onClick={() => {
@@ -166,19 +166,19 @@ export default function Studio({ month, onClose }: { month: number; onClose: () 
             }}
             aria-pressed={realistic}
             data-testid="realistic"
-            className={cx('h-10 px-3 rounded-full text-[13px] font-semibold flex items-center gap-1.5', realistic ? 'bg-gold text-[#17130C]' : 'bg-white/[0.07]')}
+            className={cx('h-10 px-3 rounded-full text-[13px] font-semibold flex items-center gap-1.5', realistic ? 'bg-sky text-[#0B1622]' : 'bg-white/[0.07]')}
           >
-            <Wand2 size={16} /> Как в жизни
+            <Wand2 size={16} /> True colors
           </button>
           <span className="flex-1" />
-          <button onClick={() => setEraser((e) => !e)} aria-pressed={eraser} aria-label="Ластик" className={cx('w-10 h-10 rounded-full flex items-center justify-center', eraser ? 'bg-gold text-[#17130C]' : 'bg-white/[0.07]')}>
+          <button onClick={() => setEraser((e) => !e)} aria-pressed={eraser} aria-label="Eraser" className={cx('w-10 h-10 rounded-full flex items-center justify-center', eraser ? 'bg-sky text-[#0B1622]' : 'bg-white/[0.07]')}>
             <Eraser size={17} />
           </button>
-          <button onClick={() => canvas.current?.reset()} aria-label="Вписать в экран" className="w-10 h-10 rounded-full bg-white/[0.07] flex items-center justify-center">
+          <button onClick={() => canvas.current?.reset()} aria-label="Fit to screen" className="w-10 h-10 rounded-full bg-white/[0.07] flex items-center justify-center">
             <Maximize2 size={16} />
           </button>
         </div>
-        <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 py-1" role="radiogroup" aria-label="Цвета мечты">
+        <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 py-1" role="radiogroup" aria-label="Palette">
           {palette.map((c) => {
             const on = !eraser && !realistic && c === color
             return (
@@ -194,18 +194,18 @@ export default function Studio({ month, onClose }: { month: number; onClose: () 
                   setEraser(false)
                   setRealistic(false)
                 }}
-                className={cx('w-10 h-10 shrink-0 rounded-full transition-transform', on ? 'ring-2 ring-gold ring-offset-[3px] ring-offset-[#161619] scale-105' : 'ring-1 ring-white/10')}
+                className={cx('w-10 h-10 shrink-0 rounded-full transition-transform', on ? 'ring-2 ring-sky ring-offset-[3px] ring-offset-[#161619] scale-105' : 'ring-1 ring-white/10')}
                 style={{ background: c }}
               />
             )
           })}
           <label className="relative w-10 h-10 shrink-0 rounded-full bg-[conic-gradient(#e7b0a0,#e9d48e,#9cc79a,#8fb7dc,#b49fd8,#e7b0a0)] flex items-center justify-center ring-1 ring-white/10">
             <Pipette size={15} className="text-black/60" />
-            <input type="color" aria-label="Свой цвет" value={color} onChange={(e) => (setColor(e.target.value.toUpperCase()), setRealistic(false), setEraser(false))} className="absolute inset-0 opacity-0" />
+            <input type="color" aria-label="Custom color" value={color} onChange={(e) => (setColor(e.target.value.toUpperCase()), setRealistic(false), setEraser(false))} className="absolute inset-0 opacity-0" />
           </label>
         </div>
         <p className="text-[11.5px] text-mute text-center">
-          {realistic ? 'Каждая область окрашивается в свой настоящий цвет' : 'Палитра подобрана по реальным цветам мечты · удерживайте «Эталон»'}
+          {realistic ? 'Every shape takes its true color' : 'A palette of the dream’s real colors · hold “Peek”'}
         </p>
       </div>
 
@@ -215,21 +215,21 @@ export default function Studio({ month, onClose }: { month: number; onClose: () 
             <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 20 }} className="mx-auto w-[64%] rounded-[22px] overflow-hidden shadow-2xl">
               <ArtView id={theme.art} fills={fills} className="w-full aspect-[3/4]" />
             </motion.div>
-            <Eyebrow className="text-gold text-center mt-7">Глава {month} · готово</Eyebrow>
-            <h2 className="serif text-[34px] leading-tight text-center mt-2">{theme.dream} — теперь на вашей доске</h2>
-            <p className="text-[14.5px] text-mute text-center mt-2">Пусть эта картина напоминает, ради чего вы находите время.</p>
+            <Eyebrow className="text-sky text-center mt-7">Sheet complete</Eyebrow>
+            <h2 className="text-[28px] font-semibold tracking-tightest leading-tight text-center mt-2">A quiet ten minutes, well spent</h2>
+            <p className="text-[14.5px] text-mute text-center mt-2">{theme.dream}, colored in. Come back whenever you need a pause.</p>
             <Button
               className="w-full mt-6"
               onClick={() => {
                 close()
-                ui.setTab('board')
+                ui.setTab('pause')
               }}
-              data-testid="to-board"
+              data-testid="studio-done"
             >
-              Открыть доску мечты
+              Back to Pause
             </Button>
             <Button variant="ghost" className="w-full" onClick={() => setDone(false)}>
-              Ещё полюбоваться
+              Keep looking
             </Button>
           </motion.div>
         )}

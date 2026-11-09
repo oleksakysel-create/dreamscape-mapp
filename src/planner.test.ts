@@ -64,3 +64,29 @@ describe('content & artwork', () => {
     }
   })
 })
+
+describe('dream card logic', () => {
+  it('shows the person’s own words, then the photo once it came true', async () => {
+    const { useStore, phraseOf, nextStage, isFulfilled } = await import('./lib/store')
+    const t1 = THEMES[0]!
+    useStore.getState().reset()
+    expect(phraseOf(useStore.getState(), 1)).toBe('')
+    expect(nextStage(useStore.getState(), 1)).toBe('thoughts')
+    useStore.getState().saveAnswers(1, { [t1.dreamQuestion]: '  A bright house by the sea  ' })
+    expect(phraseOf(useStore.getState(), 1)).toBe('A bright house by the sea')
+    useStore.getState().finishReflection(1)
+    expect(nextStage(useStore.getState(), 1)).toBe('plan')
+    useStore.getState().fulfill(1, { date: new Date(2027, 2, 14).toISOString(), photo: 'idb:x', memo: 'Done' })
+    expect(isFulfilled(useStore.getState(), 1)).toBe(true)
+    expect(useStore.getState().chapters[1]!.photo).toBe('idb:x')
+    useStore.getState().unfulfill(1)
+    expect(isFulfilled(useStore.getState(), 1)).toBe(false)
+  })
+
+  it('demo journey has one dream that came true with a photo', async () => {
+    const { demoData } = await import('./lib/demo')
+    const d = demoData()
+    expect(d.chapters[2]!.fulfilledAt).toBeTruthy()
+    expect(d.chapters[2]!.photo).toMatch(/demo\/mountains\.jpg$/)
+  })
+})

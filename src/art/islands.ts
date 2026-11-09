@@ -59,5 +59,5 @@ export function islands() {
   }
   p.add(ellipse(68, 228, 6, 6), '#5A3E26')
   p.add(ellipse(79, 229, 6, 6), '#4A3220')
-  return p.done('islands', 'Острова')
+  return p.done('islands', 'Islands')
 }

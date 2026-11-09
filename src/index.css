@@ -6,10 +6,10 @@ html, body, #root { height: 100%; }
 html, body { overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  color: #F4F2EE;
+  color: #F2F1EE;
   background:
-    radial-gradient(900px 520px at 15% -10%, rgba(217,181,122,0.10), transparent 60%),
-    radial-gradient(700px 480px at 110% 110%, rgba(110,130,200,0.08), transparent 60%),
+    radial-gradient(900px 520px at 15% -10%, rgba(156,203,240,0.09), transparent 60%),
+    radial-gradient(700px 480px at 110% 110%, rgba(156,203,240,0.05), transparent 60%),
     #050506;
   font-family: Inter, -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -22,7 +22,6 @@ input, textarea { -webkit-user-select: text; user-select: text; font-size: 16px;
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
 .tnum { font-variant-numeric: tabular-nums; }
-.serif { font-family: 'Instrument Serif', 'Cormorant Garamond', Georgia, serif; font-weight: 400; letter-spacing: -0.01em; }
 
 /* translucent iOS-style material */
 .glass {
@@ -33,16 +32,15 @@ input, textarea { -webkit-user-select: text; user-select: text; font-size: 16px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 12px 40px rgba(0, 0, 0, 0.45);
 }
 .hairline { border: 1px solid rgba(255, 255, 255, 0.07); }
-.gold-text {
-  background: linear-gradient(100deg, #F1D6A6 0%, #D9B57A 45%, #B8915A 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
 .grain::after {
   content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .05;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-textarea::placeholder, input::placeholder { color: rgba(244, 242, 238, 0.28); }
-:focus-visible { outline: 2px solid #D9B57A; outline-offset: 2px; }
+textarea::placeholder, input::placeholder { color: rgba(242, 241, 238, 0.32); }
+:focus-visible { outline: 2px solid #9CCBF0; outline-offset: 2px; }
+/* the quiet "paper" behind dream cards */
+.dream-surface { background: radial-gradient(130% 90% at 0% 0%, #24232A 0%, #151516 62%); border: 1px solid rgba(255,255,255,0.07); }
+.tracking-tightest { letter-spacing: -0.04em; }
 
 /* Electron (macOS hiddenInset title bar): let the top strip move the window */
 .drag-region { -webkit-app-region: drag; }

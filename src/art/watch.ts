@@ -63,5 +63,5 @@ export function watch() {
   p.add(poly([polar(cx, cy, 4, 330 + 90), polar(cx, cy, 58, 330), polar(cx, cy, 4, 330 - 90), polar(cx, cy, 10, 150)]), '#F7F7F5')
   p.add(poly([polar(cx, cy, 1.6, 100 + 90), polar(cx, cy, 62, 100), polar(cx, cy, 1.6, 100 - 90), polar(cx, cy, 18, 280)]), '#C8102E')
   p.add(circle(cx, cy, 5), '#C9CED4')
-  return p.done('watch', 'Часы мечты')
+  return p.done('watch', 'Dream watch')
 }

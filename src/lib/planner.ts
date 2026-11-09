@@ -12,11 +12,11 @@ import { addDays, isWeekend, parseYmd, startOfDay, startOfWeek, ymd } from './da
 export type WindowId = 'wd-morning' | 'wd-lunch' | 'wd-evening' | 'we-morning' | 'we-day'
 
 export const WINDOWS: { id: WindowId; label: string; short: string; time: string; weekend: boolean }[] = [
-  { id: 'wd-morning', label: 'Утро в будни', short: 'утро', time: '07:30', weekend: false },
-  { id: 'wd-lunch', label: 'Обед в будни', short: 'обед', time: '13:00', weekend: false },
-  { id: 'wd-evening', label: 'Вечер в будни', short: 'вечер', time: '20:30', weekend: false },
-  { id: 'we-morning', label: 'Утро выходных', short: 'утро', time: '10:00', weekend: true },
-  { id: 'we-day', label: 'День выходных', short: 'день', time: '15:00', weekend: true },
+  { id: 'wd-morning', label: 'Weekday mornings', short: 'morning', time: '07:30', weekend: false },
+  { id: 'wd-lunch', label: 'Weekday lunch breaks', short: 'lunch', time: '13:00', weekend: false },
+  { id: 'wd-evening', label: 'Weekday evenings', short: 'evening', time: '20:30', weekend: false },
+  { id: 'we-morning', label: 'Weekend mornings', short: 'morning', time: '10:00', weekend: true },
+  { id: 'we-day', label: 'Weekend afternoons', short: 'afternoon', time: '15:00', weekend: true },
 ]
 export const windowOf = (id: WindowId) => WINDOWS.find((w) => w.id === id)!
 

@@ -34,5 +34,5 @@ export function jet() {
   // near wing
   p.add(poly([[120, 198], [156, 196], [214, 236], [198, 238]]), '#CBD1D8')
   p.add(poly([[198, 238], [214, 236], [220, 222], [216, 222]]), '#1E2A44')
-  return p.done('jet', 'Частный самолёт')
+  return p.done('jet', 'Private jet')
 }

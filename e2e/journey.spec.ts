@@ -1,4 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
+import { fileURLToPath } from 'node:url'
+
+const PHOTO = fileURLToPath(new URL('../public/demo/sea.jpg', import.meta.url))
 
 function watch(page: Page) {
   const errors: string[] = []
@@ -27,107 +30,119 @@ async function tapRegion(page: Page, id: string) {
   await page.mouse.click(pt!.x, pt!.y)
 }
 
-test('onboarding → reflection → balanced plan → results → coloring → dream board', async ({ page }) => {
+test('words on the card → plan → photo of the fulfilled dream → share → pause', async ({ page }) => {
   const errors = watch(page)
   await page.goto('/')
 
-  // Positioning + setup
-  await expect(page.getByText('Ваш возраст — не причина забыть о мечтах.')).toBeVisible()
+  await expect(page.getByText('Your age is no reason to forget your dreams.')).toBeVisible()
   for (let i = 0; i < 3; i++) await page.getByTestId('onb-next').click()
-  await page.getByLabel('Имя').fill('Мария')
+  await page.getByLabel('Name').fill('Maria')
   await page.getByTestId('onb-next').click()
   await page.getByRole('radio', { name: /^5/ }).click()
   await page.getByTestId('onb-next').click()
-  await page.getByRole('checkbox', { name: /Вечер в будни/ }).click()
+  await page.getByRole('checkbox', { name: /Weekday evenings/ }).click()
   await page.getByTestId('onb-next').click()
   await page.getByTestId('onb-next').click()
 
-  // Today
-  await expect(page.getByRole('heading', { name: 'Мария' })).toBeVisible()
-  await expect(page.getByText('Неделя пока свободна')).toBeVisible()
-  await page.getByTestId('continue-chapter').click()
+  // Today: a clean card waiting for the person's words
+  await expect(page.getByRole('heading', { name: 'Today' })).toBeVisible()
+  await expect(page.getByTestId('dream-card')).toHaveAttribute('data-state', 'words')
+  await page.getByTestId('primary-action').click()
 
-  // Reflection (validation, then answers)
-  await expect(page.getByRole('heading', { name: 'Точка отсчёта' })).toBeVisible()
-  await page.getByTestId('finish-reflection').click()
-  await expect(page.getByText('Ответьте хотя бы на два вопроса')).toBeVisible()
-  await page.getByTestId('answer-m1q1').fill('Работа, дорога, дом. Своего времени почти нет.')
-  await page.getByTestId('answer-m1q2').fill('Светлый дом у моря с террасой и бассейном.')
+  // Thoughts
+  await page.getByTestId('finish-thoughts').click()
+  await expect(page.getByText('Answer at least two questions')).toBeVisible()
+  await page.getByTestId('answer-m1q1').fill('Work, commute, home. Almost no time of my own.')
+  await page.getByTestId('answer-m1q2').fill('A bright house by the sea with a terrace')
   await page.getByTestId('scale-m1q3-4').click()
-  await page.getByTestId('answer-m1q4').fill('Посмотреть три дома на выходных')
-  await page.getByTestId('finish-reflection').click()
+  await page.getByTestId('answer-m1q4').fill('Look at three houses this weekend')
+  await page.getByTestId('finish-thoughts').click()
 
-  // Plan: the step comes from the user's own answer and is placed into a free window
-  await expect(page.getByText('«Посмотреть три дома на выходных»')).toBeVisible()
+  // Plan: the step comes from their own answer and lands in a free window
   await page.getByTestId('add-own-step').click()
-  await expect(page.getByTestId('step-title')).toHaveValue('Посмотреть три дома на выходных')
-  await expect(page.getByText('Свободное окно, которое мы нашли:')).toBeVisible()
+  await expect(page.getByTestId('step-title')).toHaveValue('Look at three houses this weekend')
   await page.getByTestId('save-step').click()
-  await expect(page.getByRole('status').filter({ hasText: /Вписано в неделю|Эта неделя заполнена/ })).toBeVisible()
-  await page.getByRole('button', { name: /Собрать подборку референсов/ }).click()
-  await page.getByRole('radio', { name: 'Без даты' }).click()
-  await page.getByTestId('save-step').click()
+  await expect(page.getByRole('status').filter({ hasText: /Added to your week|This week is full/ })).toBeVisible()
 
-  // Results: log one step as done with a note
-  const row = page.getByRole('button', { name: /Посмотреть три дома/ }).first()
+  // Create: log the step
+  await page.getByRole('tab', { name: /Create/ }).click()
+  await expect(page.getByText('What did this month change for you?')).toBeVisible()
+  const row = page.getByRole('button', { name: /Look at three houses/ }).last()
   await row.evaluate((el) => el.scrollIntoView({ block: 'center' }))
   await row.click()
-  await page.getByTestId('step-result').fill('Нашла два района, которые нравятся')
+  await page.getByTestId('step-result').fill('Found two areas I love')
   await page.getByTestId('mark-done').click()
-  await page.getByRole('radio', { name: 'Итоги' }).click()
-  await expect(page.getByText('«Нашла два района, которые нравятся»')).toBeVisible()
+  await expect(page.getByText('“Found two areas I love”')).toBeVisible()
 
-  // Coloring: manual fill + undo, then realistic brush to completion
-  await page.getByRole('radio', { name: 'Мечта' }).click()
+  // The card shows their words
+  await page.getByTestId('nav-back').click()
+  await expect(page.getByTestId('dream-phrase')).toHaveCount(1)
+  await expect(page.getByTestId('dream-phrase')).toHaveText('A bright house by the sea with a terrace')
+
+  // Share renders an image
+  await page.getByTestId('share').click()
+  await expect(page.getByTestId('share-preview')).toBeVisible()
+  await page.getByRole('radio', { name: 'Square' }).click()
+  await expect(page.getByTestId('share-preview')).toBeVisible()
+  await page.mouse.click(10, 60)
+
+  // It came true: attach a real photo
+  await page.getByTestId('attach').click()
+  await page.getByTestId('photo-input').setInputFiles(PHOTO)
+  await expect(page.getByAltText('Selected photo')).toBeVisible()
+  await page.getByTestId('mark-fulfilled').click()
+  await expect(page.getByTestId('dream-card')).toHaveAttribute('data-state', 'fulfilled')
+  await expect(page.getByTestId('dream-card').getByRole('img')).toBeVisible()
+
+  await page.getByRole('button', { name: 'Board' }).click()
+  await expect(page.getByTestId('board-1')).toHaveAttribute('data-fulfilled', 'true')
+
+  // Persists across reload (photo comes back from IndexedDB)
+  await page.reload()
+  await expect(page.getByTestId('dream-card')).toHaveAttribute('data-state', 'fulfilled')
+  await expect(page.getByTestId('dream-card').getByRole('img')).toBeVisible()
+
+  // Pause: coloring as a separate, calm activity
+  await page.getByRole('button', { name: 'Pause', exact: true }).click()
   await page.getByTestId('open-studio').click()
+  await expect(page.getByTestId('canvas')).toBeVisible()
+  await page.waitForTimeout(800) // let the sheet finish sliding up
   const total = await page.locator('[data-region]').count()
   await tapRegion(page, 'v1')
   await expect(page.getByTestId('progress')).toHaveText(`1/${total}`)
-  await page.getByRole('button', { name: 'Отменить' }).click()
+  await page.getByRole('button', { name: 'Undo' }).click()
   await expect(page.getByTestId('progress')).toHaveText(`0/${total}`)
-  await page.getByTestId('realistic').click()
-  const ids = await page.locator('[data-region]').evaluateAll((els) => els.map((e) => e.getAttribute('data-region')!))
-  for (const id of ids) await tapRegion(page, id)
-  await expect(page.getByTestId('progress')).toHaveText(`${total}/${total}`)
-  await expect(page.locator('[data-region="v1"]')).toHaveAttribute('fill', '#2E3A64')
-  await expect(page.getByText('теперь на вашей доске')).toBeVisible()
-  await page.getByTestId('to-board').click()
-  await expect(page.getByTestId('board-1')).toHaveAttribute('data-done', 'true')
-
-  // Persists across reload
-  await page.reload()
-  await page.getByRole('button', { name: 'Доска' }).click()
-  await expect(page.getByTestId('board-1')).toHaveAttribute('data-done', 'true')
-  await page.getByRole('button', { name: 'Путь' }).click()
-  await expect(page.getByTestId('chapter-1')).toBeVisible()
 
   expect(errors).toEqual([])
 })
 
-test('demo journey opens every screen without errors', async ({ page }) => {
+test('example journey opens every screen without errors', async ({ page }) => {
   const errors = watch(page)
   await page.goto('/')
   await page.getByTestId('onb-demo').click()
-  await expect(page.getByRole('heading', { name: 'Анна' })).toBeVisible()
-  await page.getByRole('button', { name: 'Доска' }).click()
-  await expect(page.getByTestId('board-2')).toHaveAttribute('data-done', 'true')
-  await page.getByTestId('board-1').click()
-  await expect(page.getByRole('dialog')).toContainText('Светлый дом у моря')
-  await page.mouse.click(5, 100)
-  await page.getByRole('button', { name: 'Сегодня' }).click()
-  await page.getByRole('button', { name: 'Профиль' }).click()
+  await expect(page.getByRole('heading', { name: 'Today' })).toBeVisible()
+  await page.getByRole('button', { name: 'Journey' }).click()
+  await page.getByTestId('chapter-2').click()
+  await expect(page.getByTestId('dream-card')).toHaveAttribute('data-state', 'fulfilled')
+  await page.getByTestId('chapter-share').click()
+  await expect(page.getByTestId('share-preview')).toBeVisible()
+  await page.mouse.click(10, 60)
+  await page.getByTestId('nav-back').click()
+  await page.getByRole('button', { name: 'Board' }).click()
+  await expect(page.getByTestId('board-2')).toHaveAttribute('data-fulfilled', 'true')
+  await page.getByRole('button', { name: 'Today' }).click()
+  await page.getByRole('button', { name: 'Profile' }).click()
   await page.getByTestId('reset').click()
   await page.getByTestId('confirm-reset').click()
   await expect(page.getByTestId('onb-next')).toBeVisible()
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)
-  expect(overflow).toBe(false)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false)
   expect(errors).toEqual([])
 })
 
-test('desktop shows the app inside a phone frame @desktop', async ({ page }) => {
+test('desktop shows the app inside an iPhone frame with a status bar @desktop', async ({ page }) => {
   await page.goto('/')
   await page.getByTestId('onb-demo').click()
-  const box = await page.getByRole('heading', { name: 'Анна' }).boundingBox()
+  const box = await page.getByRole('heading', { name: 'Today' }).boundingBox()
   expect(box!.x).toBeGreaterThan(400)
   await expect(page.getByText('9:41')).toBeVisible()
 })

@@ -1,10 +1,11 @@
 import { create } from 'zustand'
 
-export type Tab = 'today' | 'journey' | 'board'
+export type Tab = 'today' | 'journey' | 'board' | 'pause'
 export type SheetState =
   | { type: 'addStep'; month: number; title?: string }
   | { type: 'step'; id: string }
-  | { type: 'dream'; month: number }
+  | { type: 'attach'; month: number }
+  | { type: 'share'; month: number }
   | null
 
 interface UI {

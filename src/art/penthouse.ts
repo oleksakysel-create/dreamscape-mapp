@@ -48,5 +48,5 @@ export function penthouse() {
   const base: Pt = [39, 334]
   const tips: [Pt, string][] = [[[8, 280], '#3F6B4A'], [[28, 262], '#4F7F57'], [[52, 264], '#3F6B4A'], [[74, 284], '#4F7F57'], [[40, 250], '#5E9068']]
   for (const [t, c] of tips) p.add(leaf(base, t, 8), c)
-  return p.done('penthouse', 'Пентхаус')
+  return p.done('penthouse', 'Penthouse')
 }

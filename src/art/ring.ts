@@ -41,5 +41,5 @@ export function diamond() {
   p.add(sparkle(104, 92, 9), '#FFFFFF')
   p.add(sparkle(196, 86, 7), '#FFFFFF')
   p.add(sparkle(188, 150, 5), '#FFFFFF')
-  return p.done('ring', 'Кольцо с бриллиантом')
+  return p.done('ring', 'Diamond ring')
 }

@@ -1,64 +1,80 @@
 import { motion } from 'framer-motion'
-import { ArtView } from '../components/ArtView'
-import { Eyebrow } from '../components/ui'
+import { useState } from 'react'
+import { DreamTile } from '../components/DreamCard'
+import { cx, LargeTitle } from '../components/ui'
 import { THEMES } from '../data/themes'
-import { chapterOf, coloringProgress, useStore } from '../lib/store'
-import { useUI } from '../lib/ui'
+import { chapterOf, phraseOf, useStore } from '../lib/store'
+import { haptic, useUI } from '../lib/ui'
+
+type Filter = 'all' | 'true' | 'way'
 
 export default function Board() {
   const data = useStore()
-  const openSheet = useUI((s) => s.openSheet)
   const openChapter = useUI((s) => s.openChapter)
-  const colored = THEMES.filter((t) => chapterOf(data, t.month).coloredAt)
+  const [filter, setFilter] = useState<Filter>('all')
+  const came = THEMES.filter((t) => chapterOf(data, t.month).fulfilledAt)
+  const items = THEMES.filter((t) => {
+    const f = Boolean(chapterOf(data, t.month).fulfilledAt)
+    return filter === 'all' || (filter === 'true' ? f : !f)
+  })
   const cols: (typeof THEMES)[] = [[], []]
-  THEMES.forEach((t, i) => cols[i % 2]!.push(t))
+  items.forEach((t, i) => cols[i % 2]!.push(t))
+  const heightOf = (m: number, i: number) => {
+    if (chapterOf(data, m).fulfilledAt) return i % 2 ? 220 : 252
+    const p = phraseOf(data, m)
+    if (!p) return 112
+    return p.length > 70 ? 204 : 168
+  }
 
   return (
-    <div className="px-5">
-      <header className="pt-2 pb-5">
-        <Eyebrow>Доска визуализации</Eyebrow>
-        <h1 className="serif text-[38px] leading-[1.05] mt-1">Мои мечты</h1>
-        <p className="text-[14px] text-mute mt-2">
-          {colored.length ? `Раскрашено ${colored.length} из 12. Каждая картина — цель, у которой есть место в вашей неделе.` : 'Раскрасьте мечту месяца — и она появится здесь в цвете.'}
-        </p>
-      </header>
-      <div className="grid grid-cols-2 gap-3" data-testid="board">
-        {cols.map((col, ci) => (
-          <div key={ci} className={ci ? 'space-y-3 pt-10' : 'space-y-3'}>
-            {col.map((t, i) => {
-              const c = chapterOf(data, t.month)
-              const p = coloringProgress(data, t.month)
-              const caption = (c.answers[t.dreamQuestion] ?? '').trim()
-              const done = Boolean(c.coloredAt)
-              return (
-                <motion.button
-                  key={t.month}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: (i * 2 + ci) * 0.04 }}
-                  onClick={() => (done ? openSheet({ type: 'dream', month: t.month }) : openChapter(t.month))}
-                  data-testid={`board-${t.month}`}
-                  data-done={done}
-                  className="block w-full text-left"
-                >
-                  <div className="relative rounded-[18px] overflow-hidden bg-white">
-                    <ArtView id={t.art} fills={c.fills} className={done ? 'w-full aspect-[3/4]' : 'w-full aspect-[3/4] opacity-[0.88]'} />
-                    {!done && (
-                      <span className="absolute bottom-2 left-2 px-2 py-1 rounded-full bg-black/70 text-[11px] font-semibold tnum">
-                        {p > 0 ? `${Math.round(p * 100)}%` : `Глава ${t.month}`}
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-2 px-0.5">
-                    <div className="text-[14px] font-semibold">{t.dream}</div>
-                    {caption && <div className="text-[12.5px] text-mute line-clamp-2 mt-0.5">{caption}</div>}
-                  </div>
-                </motion.button>
-              )
-            })}
-          </div>
+    <div className="pb-4">
+      <LargeTitle title="Board" sub={`${came.length} came true · ${12 - came.length} on the way`} />
+      <div className="px-5 pb-4 flex gap-1.5" role="tablist" aria-label="Filter">
+        {(
+          [
+            ['all', 'All'],
+            ['true', 'Came true'],
+            ['way', 'On the way'],
+          ] as const
+        ).map(([id, label]) => (
+          <button
+            key={id}
+            role="tab"
+            aria-selected={filter === id}
+            onClick={() => {
+              haptic()
+              setFilter(id)
+            }}
+            className={cx('h-[34px] px-3.5 rounded-full text-[13px]', filter === id ? 'bg-paper text-[#141414] font-semibold' : 'border border-white/[0.16] text-[#D8D6D1] font-medium')}
+          >
+            {label}
+          </button>
         ))}
       </div>
+      {items.length === 0 ? (
+        <p className="px-5 text-[15px] text-mute leading-relaxed">Nothing here yet. When a dream comes true, add its photo — it will appear on this board.</p>
+      ) : (
+        <div className="px-4 grid grid-cols-2 gap-2.5" data-testid="board">
+          {cols.map((col, ci) => (
+            <div key={ci} className="flex flex-col gap-2.5">
+              {col.map((t, i) => (
+                <motion.button
+                  key={t.month}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: (i * 2 + ci) * 0.03 }}
+                  onClick={() => openChapter(t.month)}
+                  data-testid={`board-${t.month}`}
+                  data-fulfilled={Boolean(chapterOf(data, t.month).fulfilledAt)}
+                  className="block w-full"
+                >
+                  <DreamTile month={t.month} height={heightOf(t.month, i + ci)} />
+                </motion.button>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

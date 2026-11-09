@@ -40,5 +40,5 @@ export function yacht() {
   // wake
   p.add(leaf([30, 292], [110, 300], 3), '#FFFFFF')
   p.add(leaf([240, 296], [298, 300], 3), '#D6EEF8')
-  return p.done('yacht', 'Яхта')
+  return p.done('yacht', 'Yacht')
 }

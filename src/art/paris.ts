@@ -37,5 +37,5 @@ export function paris() {
   bld(-4, 96, 316, '#E8DCC6')
   bld(92, 112, 330, '#E2D3BA')
   bld(204, 100, 312, '#EBE1CE')
-  return p.done('paris', 'Париж')
+  return p.done('paris', 'Paris')
 }

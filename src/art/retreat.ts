@@ -53,5 +53,5 @@ export function retreat() {
   p.add(ellipse(48, 352, 34, 18), '#8C8A85')
   p.add(ellipse(60, 346, 18, 10), '#A4A29C')
   p.add(ellipse(258, 366, 26, 13), '#6F6D69')
-  return p.done('retreat', 'Горный ретрит')
+  return p.done('retreat', 'Mountain retreat')
 }

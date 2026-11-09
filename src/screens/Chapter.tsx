@@ -1,23 +1,18 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronLeft, Palette, PencilLine, Plus, Sparkles } from 'lucide-react'
+import { Camera, Palette, PencilLine, Plus, Share } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { ArtView } from '../components/ArtView'
-import { Button, Card, cx, Eyebrow, Segmented } from '../components/ui'
+import { DreamCard } from '../components/DreamCard'
+import { Button, cx, Eyebrow, NavBar, UnderlineTabs } from '../components/ui'
 import { getTheme } from '../data/themes'
-import { chapterMonthName } from '../lib/dates'
+import { chapterMonthLong } from '../lib/dates'
 import { WINDOWS } from '../lib/planner'
-import { chapterOf, chapterStages, nextStage, useStore, type StageId } from '../lib/store'
+import { chapterOf, chapterStages, nextStage, STAGES, useStore, type StageId } from '../lib/store'
 import { haptic, useUI } from '../lib/ui'
 import { StepRow } from './Today'
 
-const TABS: { id: StageId; label: string }[] = [
-  { id: 'reflect', label: 'Рефлексия' },
-  { id: 'plan', label: 'План' },
-  { id: 'results', label: 'Итоги' },
-  { id: 'color', label: 'Мечта' },
-]
+const field = 'w-full border-0 border-b border-white/[0.16] bg-transparent py-2 text-[16px] leading-relaxed outline-none resize-none focus:border-sky'
 
-function Reflection({ month, onDone }: { month: number; onDone: () => void }) {
+function Thoughts({ month, onDone }: { month: number; onDone: () => void }) {
   const theme = getTheme(month)!
   const chapter = useStore((s) => chapterOf(s, month))
   const save = useStore((s) => s.saveAnswers)
@@ -28,7 +23,6 @@ function Reflection({ month, onDone }: { month: number; onDone: () => void }) {
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const locked = Boolean(chapter.reflectedAt)
 
-  // autosave drafts
   useEffect(() => {
     clearTimeout(timer.current)
     timer.current = setTimeout(() => save(month, answers), 500)
@@ -44,18 +38,17 @@ function Reflection({ month, onDone }: { month: number; onDone: () => void }) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {theme.questions.map((q, i) => (
-        <div key={q.id}>
-          <div className="flex gap-3">
-            <span className="serif text-[22px] text-gold leading-none pt-0.5 tnum">{i + 1}</span>
-            <div className="flex-1">
-              <label htmlFor={q.id} className="block text-[17px] font-medium leading-snug">
-                {q.prompt}
-              </label>
-              <div className="text-[13px] text-mute mt-1">{q.hint}</div>
-            </div>
+        <div key={q.id} className="space-y-2">
+          <div className="text-[12px] text-mute tnum">
+            {i + 1} / {theme.questions.length}
+            {q.id === theme.dreamQuestion && <span className="text-sky"> · shown on your dream card</span>}
           </div>
+          <label htmlFor={q.id} className="block text-[19px] font-medium leading-[1.3] tracking-[-0.025em]">
+            {q.prompt}
+          </label>
+          <div className="text-[13px] text-mute">{q.hint}</div>
           {q.kind === 'text' ? (
             <textarea
               id={q.id}
@@ -63,12 +56,12 @@ function Reflection({ month, onDone }: { month: number; onDone: () => void }) {
               readOnly={locked}
               value={answers[q.id] ?? ''}
               onChange={(e) => setAnswers((a) => ({ ...a, [q.id]: e.target.value }))}
-              placeholder="Ваш ответ…"
-              rows={3}
-              className={cx('mt-3 w-full rounded-2xl bg-white/[0.05] hairline px-4 py-3 text-[16px] leading-relaxed outline-none resize-none focus:border-gold/50', locked && 'opacity-80')}
+              placeholder="Your answer…"
+              rows={2}
+              className={cx(field, locked && 'text-soft')}
             />
           ) : (
-            <div className="mt-3 grid grid-cols-10 gap-1" role="radiogroup" aria-label={q.prompt}>
+            <div className="pt-1 grid grid-cols-10 gap-1" role="radiogroup" aria-label={q.prompt}>
               {Array.from({ length: 10 }, (_, k) => String(k + 1)).map((v) => (
                 <button
                   key={v}
@@ -80,7 +73,7 @@ function Reflection({ month, onDone }: { month: number; onDone: () => void }) {
                     haptic()
                     setAnswers((a) => ({ ...a, [q.id]: v }))
                   }}
-                  className={cx('h-11 rounded-xl text-[15px] font-semibold tnum', answers[q.id] === v ? 'bg-gold text-[#17130C]' : 'bg-white/[0.05] text-fg/80')}
+                  className={cx('h-11 rounded-[12px] text-[15px] font-semibold tnum', answers[q.id] === v ? 'bg-sky text-[#0B1622]' : 'bg-white/[0.06] text-soft')}
                 >
                   {v}
                 </button>
@@ -89,14 +82,14 @@ function Reflection({ month, onDone }: { month: number; onDone: () => void }) {
           )}
         </div>
       ))}
-      {error && !locked && <p className="text-[14px] text-rose">Ответьте хотя бы на два вопроса — пусть даже коротко.</p>}
+      {error && !locked && <p className="text-[14px] text-rose">Answer at least two questions — even briefly.</p>}
       {locked ? (
         <Button variant="glass" className="w-full" onClick={() => reopen(month)}>
-          <PencilLine size={18} /> Изменить ответы
+          <PencilLine size={18} /> Edit answers
         </Button>
       ) : (
-        <Button className="w-full" onClick={complete} data-testid="finish-reflection">
-          Завершить рефлексию
+        <Button className="w-full" onClick={complete} data-testid="finish-thoughts">
+          Save my thoughts
         </Button>
       )}
     </div>
@@ -106,65 +99,62 @@ function Reflection({ month, onDone }: { month: number; onDone: () => void }) {
 function Plan({ month }: { month: number }) {
   const theme = getTheme(month)!
   const chapter = useStore((s) => chapterOf(s, month))
-  const steps = useStore((s) => s.steps).filter((s) => s.month === month)
+  const allSteps = useStore((s) => s.steps)
+  const steps = allSteps.filter((s) => s.month === month)
   const profile = useStore((s) => s.profile!)
   const openSheet = useUI((s) => s.openSheet)
   const own = (chapter.answers[theme.stepQuestion] ?? '').trim()
   const taken = new Set(steps.map((s) => s.title.toLowerCase()))
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-7">
       {own && !taken.has(own.toLowerCase()) && (
-        <Card className="p-5 border-gold/30 bg-goldsoft">
-          <Eyebrow className="text-gold">Из вашей рефлексии</Eyebrow>
-          <div className="text-[17px] font-medium mt-2 leading-snug">«{own}»</div>
+        <div className="rounded-[24px] p-5 bg-skysoft border border-sky/20">
+          <Eyebrow className="text-sky">From your thoughts</Eyebrow>
+          <div className="text-[17px] font-medium mt-2 leading-snug">“{own}”</div>
           <Button className="w-full mt-4 h-12" onClick={() => openSheet({ type: 'addStep', month, title: own })} data-testid="add-own-step">
-            <Plus size={18} /> Вписать в неделю
+            <Plus size={18} /> Fit it into my week
           </Button>
-        </Card>
+        </div>
       )}
-      {!chapter.reflectedAt && !own && (
-        <Card className="p-5">
-          <div className="text-[15px] text-mute">План строится из ответов. Начните с рефлексии — или добавьте свой шаг прямо сейчас.</div>
-        </Card>
-      )}
+      {!own && !chapter.reflectedAt && <p className="text-[15px] text-mute leading-relaxed">The plan grows out of your thoughts. Start there — or add your own step right now.</p>}
       <div>
-        <Eyebrow className="px-1">Идеи для мечты «{theme.dream}»</Eyebrow>
-        <div className="mt-2.5 flex flex-wrap gap-2">
+        <Eyebrow>Ideas for “{theme.dream}”</Eyebrow>
+        <div className="mt-3 flex flex-wrap gap-2">
           {theme.suggestions
             .filter((s) => !taken.has(s.toLowerCase()))
             .map((s) => (
-              <button key={s} onClick={() => openSheet({ type: 'addStep', month, title: s })} className="px-3.5 py-2.5 rounded-2xl bg-white/[0.05] hairline text-[14px] text-left flex items-center gap-2">
-                <Plus size={14} className="text-gold shrink-0" /> {s}
+              <button key={s} onClick={() => openSheet({ type: 'addStep', month, title: s })} className="px-3.5 py-2.5 rounded-[16px] border border-white/[0.12] text-[14px] text-left flex items-center gap-2">
+                <Plus size={14} className="text-sky shrink-0" /> {s}
               </button>
             ))}
         </div>
       </div>
       <div>
-        <div className="flex items-baseline justify-between px-1">
-          <Eyebrow>Шаги месяца</Eyebrow>
-          <button onClick={() => openSheet({ type: 'addStep', month })} className="text-[14px] text-gold font-semibold" data-testid="add-step">
-            + Свой шаг
+        <div className="flex items-baseline justify-between">
+          <Eyebrow>Steps this month</Eyebrow>
+          <button onClick={() => openSheet({ type: 'addStep', month })} className="text-[14px] text-sky font-semibold" data-testid="add-step">
+            + Your own step
           </button>
         </div>
         {steps.length ? (
-          <Card className="px-4 mt-2 divide-y divide-white/[0.06]">
+          <div className="mt-1 divide-y divide-white/[0.08]">
             {steps.map((s) => (
               <StepRow key={s.id} step={s} onClick={() => openSheet({ type: 'step', id: s.id })} />
             ))}
-          </Card>
+          </div>
         ) : (
-          <p className="text-[14px] text-mute px-1 mt-2">Пока пусто. Один небольшой шаг — уже движение.</p>
+          <p className="text-[14px] text-mute mt-3">Nothing yet. One small step is already movement.</p>
         )}
-        <p className="text-[12.5px] text-mute/80 px-1 mt-3 leading-relaxed">
-          Шаги ложатся в ваши окна ({profile.windows.map((w) => WINDOWS.find((x) => x.id === w)!.label.toLowerCase()).join(', ')}) и не превышают {Math.round(profile.weeklyMinutes / 60)} ч в неделю. Если неделя заполнена — переносим, а не перегружаем.
+        <p className="text-[12.5px] text-mute/90 mt-4 leading-relaxed">
+          Steps go into your windows ({profile.windows.map((w) => WINDOWS.find((x) => x.id === w)!.label.toLowerCase()).join(', ')}) and never exceed {Math.round(profile.weeklyMinutes / 60)} h a week. If a week is full, we move things — we don’t overload you.
         </p>
       </div>
     </div>
   )
 }
 
-function Results({ month }: { month: number }) {
+function Create({ month }: { month: number }) {
   const steps = useStore((s) => s.steps).filter((s) => s.month === month)
   const chapter = useStore((s) => chapterOf(s, month))
   const setNote = useStore((s) => s.setClosingNote)
@@ -177,126 +167,139 @@ function Results({ month }: { month: number }) {
   const count = (st: string) => steps.filter((s) => s.status === st).length
 
   return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-3 gap-2">
-        {[
-          ['Сделано', count('done'), 'text-sage'],
-          ['Частично', count('partly'), 'text-gold'],
-          ['Отпущено', count('released'), 'text-mute'],
-        ].map(([l, n, c]) => (
-          <Card key={l as string} className="p-4">
-            <div className={cx('serif text-[34px] leading-none tnum', c as string)}>{n}</div>
-            <div className="text-[12px] text-mute mt-1">{l}</div>
-          </Card>
+    <div className="space-y-7">
+      <div className="grid grid-cols-3 text-center">
+        {(
+          [
+            ['Done', count('done')],
+            ['Partly', count('partly')],
+            ['Let go', count('released')],
+          ] as const
+        ).map(([l, n]) => (
+          <div key={l} className="flex flex-col gap-0.5">
+            <span className="text-[26px] font-medium tnum tracking-tight">{n}</span>
+            <span className="text-[12px] text-mute">{l}</span>
+          </div>
         ))}
       </div>
       {steps.length > 0 ? (
-        <Card className="px-4 divide-y divide-white/[0.06]">
+        <div className="divide-y divide-white/[0.08]">
           {steps.map((s) => (
             <div key={s.id}>
               <StepRow step={s} onClick={() => openSheet({ type: 'step', id: s.id })} />
-              {s.result && <div className="text-[13px] text-fg/70 pb-3 pl-[46px] -mt-1 italic">«{s.result}»</div>}
+              {s.result && <div className="text-[13.5px] text-soft pb-3 pl-[34px] -mt-1">“{s.result}”</div>}
             </div>
           ))}
-        </Card>
+        </div>
       ) : (
-        <p className="text-[14px] text-mute">Здесь появятся итоги ваших шагов. Отмечайте, что получилось, — без оценок.</p>
+        <p className="text-[14px] text-mute">Your steps and what came of them will appear here. Tap a step to log it — no grades.</p>
       )}
-      <div>
-        <label htmlFor="closing" className="block text-[17px] font-medium">Что этот месяц изменил для вас?</label>
-        <textarea
-          id="closing"
-          value={note}
-          onChange={(e) => setLocal(e.target.value)}
-          rows={3}
-          placeholder="Пара предложений для себя через год"
-          className="mt-3 w-full rounded-2xl bg-white/[0.05] hairline px-4 py-3 text-[16px] leading-relaxed outline-none resize-none focus:border-gold/50"
-        />
+      <div className="space-y-1">
+        <label htmlFor="closing" className="block text-[17px] font-medium">
+          What did this month change for you?
+        </label>
+        <textarea id="closing" value={note} onChange={(e) => setLocal(e.target.value)} rows={2} placeholder="A couple of sentences for yourself a year from now" className={field} />
       </div>
     </div>
   )
 }
 
-function Dream({ month }: { month: number }) {
+function Result({ month }: { month: number }) {
   const theme = getTheme(month)!
-  const data = useStore()
-  const c = chapterOf(data, month)
-  const st = chapterStages(data, month)
-  const openStudio = useUI((s) => s.openStudio)
-  const caption = (c.answers[theme.dreamQuestion] ?? '').trim()
+  const chapter = useStore((s) => chapterOf(s, month))
+  const unfulfill = useStore((s) => s.unfulfill)
+  const ui = useUI()
+  if (chapter.fulfilledAt) {
+    return (
+      <div className="space-y-3">
+        <p className="text-[15px] text-soft leading-relaxed">It came true. Your photo is now the cover of this dream on the board.</p>
+        <div className="grid grid-cols-2 gap-2">
+          <Button variant="glass" onClick={() => ui.openSheet({ type: 'attach', month })}>
+            <Camera size={18} /> Change photo
+          </Button>
+          <Button onClick={() => ui.openSheet({ type: 'share', month })}>
+            <Share size={18} /> Share
+          </Button>
+        </div>
+        <button onClick={() => unfulfill(month)} className="w-full h-11 text-[13px] text-mute">
+          Mark as not yet fulfilled
+        </button>
+      </div>
+    )
+  }
   return (
     <div className="space-y-5">
-      <button onClick={() => openStudio(month)} className="block w-full rounded-[24px] overflow-hidden bg-white" aria-label="Открыть раскраску">
-        <ArtView id={theme.art} fills={c.fills} className="w-full aspect-[3/4]" />
-      </button>
-      {caption && (
-        <p className="serif text-[22px] leading-snug text-fg/90">
-          <span className="text-gold">“</span>
-          {caption}
-          <span className="text-gold">”</span>
-        </p>
-      )}
-      <div className="flex items-center justify-between text-[14px]">
-        <span className="text-mute">{st.color ? 'Раскраска завершена — она на вашей доске' : 'Раскрашено'}</span>
-        <span className="tnum font-semibold">{Math.round(st.coloring * 100)}%</span>
-      </div>
-      <Button className="w-full" onClick={() => openStudio(month)} data-testid="open-studio">
-        <Palette size={18} /> {st.coloring === 0 ? 'Раскрасить мечту' : st.color ? 'Открыть раскраску' : 'Продолжить раскраску'}
+      <p className="text-[15px] text-soft leading-relaxed">
+        When “{theme.dream.toLowerCase()}” comes true, add a real photo of it. Until then, your own words stay on the card — there’s no deadline.
+      </p>
+      <Button className="w-full" onClick={() => ui.openSheet({ type: 'attach', month })} data-testid="open-attach">
+        <Camera size={18} /> It came true — add a photo
+      </Button>
+      <Button
+        variant="glass"
+        className="w-full"
+        onClick={() => {
+          ui.openChapter(null)
+          ui.setTab('pause')
+          ui.openStudio(month)
+        }}
+      >
+        <Palette size={18} /> Color this dream while you wait
       </Button>
     </div>
   )
 }
 
-export default function Chapter({ month, onBack }: { month: number; onBack: () => void }) {
+export default function Chapter({ month, back, onBack }: { month: number; back: string; onBack: () => void }) {
   const theme = getTheme(month)!
   const data = useStore()
-  const c = chapterOf(data, month)
-  const [tab, setTab] = useState<StageId>(() => nextStage(data, month) ?? 'reflect')
-  const notify = useUI((s) => s.notify)
+  const st = chapterStages(data, month)
+  const [tab, setTab] = useState<StageId>(() => nextStage(data, month))
+  const ui = useUI()
+  const done: Record<StageId, boolean> = { thoughts: st.thoughts, plan: st.plan, create: st.create, result: st.result }
 
   return (
     <div>
-      <div className="relative h-[360px] overflow-hidden">
-        <ArtView id={theme.art} fills={c.fills} className="absolute inset-0 w-full h-full" line="rgba(0,0,0,0.3)" />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-ink/20" />
-        <button onClick={onBack} aria-label="Назад" className="absolute left-4 top-[max(54px,calc(env(safe-area-inset-top)+8px))] w-10 h-10 rounded-full glass flex items-center justify-center">
-          <ChevronLeft size={22} />
-        </button>
-        <div className="absolute inset-x-0 bottom-0 px-5 pb-4">
-          <Eyebrow className="text-gold">
-            Глава {month} · {chapterMonthName(data.profile!.start, month)}
-          </Eyebrow>
-          <h1 className="serif text-[44px] leading-none mt-2">{theme.title}</h1>
-          <p className="text-[14.5px] text-fg/70 mt-2 leading-relaxed">{theme.intro}</p>
+      <NavBar
+        back={back}
+        onBack={onBack}
+        title={theme.dream}
+        right={
+          <button aria-label="Share" onClick={() => ui.openSheet({ type: 'share', month })} className="w-11 h-11 flex items-center justify-center text-sky" data-testid="chapter-share">
+            <Share size={21} strokeWidth={1.9} />
+          </button>
+        }
+      />
+      <div className="px-5 pt-3 pb-5 space-y-1.5">
+        <div className="text-[13px] text-mute">
+          Chapter {month} · {chapterMonthLong(data.profile!.start, month)}
         </div>
+        <h1 className="text-[30px] font-semibold tracking-tightest leading-[1.05]">{theme.title}</h1>
+        <p className="text-[14.5px] text-mute leading-relaxed">{theme.intro}</p>
       </div>
-      <div className="px-5 pt-3 sticky top-0 z-10">
-        <div className="glass rounded-[20px] p-1">
-          <Segmented value={tab} onChange={setTab} options={TABS} />
-        </div>
+      <div className="px-4">
+        <DreamCard month={month} meta={false} minHeight={280} />
+      </div>
+      <div className="px-5 pt-6 sticky top-[env(safe-area-inset-top)] sm:top-[54px] z-10 bg-ink/95 backdrop-blur">
+        <UnderlineTabs value={tab} onChange={setTab} options={STAGES.map((s) => ({ ...s, done: done[s.id] }))} />
       </div>
       <div className="px-5 pt-6">
         <AnimatePresence mode="wait">
           <motion.div key={tab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.2 }}>
-            {tab === 'reflect' && (
-              <Reflection
+            {tab === 'thoughts' && (
+              <Thoughts
                 month={month}
                 onDone={() => {
-                  notify('Рефлексия сохранена', 'Теперь превратим ответы в план')
+                  ui.notify('Thoughts saved', 'Now let’s turn them into a plan')
                   setTab('plan')
                 }}
               />
             )}
             {tab === 'plan' && <Plan month={month} />}
-            {tab === 'results' && <Results month={month} />}
-            {tab === 'color' && <Dream month={month} />}
+            {tab === 'create' && <Create month={month} />}
+            {tab === 'result' && <Result month={month} />}
           </motion.div>
         </AnimatePresence>
-        {tab === 'plan' && (
-          <p className="mt-6 flex items-center gap-2 text-[12.5px] text-mute">
-            <Sparkles size={14} className="text-gold" /> Мечта месяца ждёт во вкладке «Мечта».
-          </p>
-        )}
       </div>
     </div>
   )
