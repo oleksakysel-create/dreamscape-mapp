@@ -1,3 +1,7 @@
+import blackCar from '../assets/stories/black-car.jpg'
+import parisBreakfast from '../assets/stories/paris-breakfast.jpg'
+import regatta from '../assets/stories/regatta.jpg'
+
 /**
  * Success stories shown to newcomers. Prototype content: replace the
  * people, words and posters with real (consented) member stories.
@@ -18,11 +22,77 @@ export interface Story {
   memo: string
   months: number
   hours: number
-  /** Poster artwork id */
+  /** Poster artwork id (used when there is no photo, and for colours) */
   art: string
+  /** Photo of the dream that came true, and its focal point */
+  photo?: string
+  focus?: string
 }
 
 export const STORIES: Story[] = [
+  {
+    id: 'elena',
+    name: 'Elena',
+    age: 56,
+    city: 'Lisbon',
+    chapter: 'Discovery',
+    title: 'Paris, finally, on my own',
+    words: 'Coffee on a terrace in Paris, with nowhere to be. I’ve said “next year” for thirty years.',
+    thought: { prompt: 'What would make it feel safe?', answer: 'A small hotel I’ve read about, and a plan for the first day only.' },
+    steps: [
+      { title: 'Renew my passport', when: 'Thu morning · 30 min' },
+      { title: 'Learn twenty phrases in French', when: '10 min a day' },
+      { title: 'Book a hotel near the Seine', when: 'Sat morning · 30 min' },
+    ],
+    memo: 'Breakfast in bed, an old film, Paris balconies outside the window. Five days, and I ordered everything in French.',
+    months: 5,
+    hours: 14,
+    art: 'paris',
+    photo: parisBreakfast,
+    focus: '50% 62%',
+  },
+  {
+    id: 'michael',
+    name: 'Michael',
+    age: 49,
+    city: 'Dublin',
+    chapter: 'Courage',
+    title: 'The car I always wanted',
+    words: 'A black sports car. Not practical, not sensible. Mine.',
+    thought: { prompt: 'What would you say to the voice that says “too late”?', answer: 'That I’m not buying it for twenty-year-old me. I’m buying it for me now.' },
+    steps: [
+      { title: 'Work out the real monthly cost', when: 'Thu evening · 45 min' },
+      { title: 'Test drive two models', when: 'Sat morning · 2 h' },
+      { title: 'Sell the second family car', when: 'Over two weeks' },
+    ],
+    memo: 'First real drive was up into the mountains, in fresh snow. I took the long way home.',
+    months: 8,
+    hours: 12,
+    art: 'car',
+    photo: blackCar,
+    focus: '50% 60%',
+  },
+  {
+    id: 'tom',
+    name: 'Tom',
+    age: 61,
+    city: 'Brighton',
+    chapter: 'Freedom',
+    title: 'A regatta with my son',
+    words: 'Crewing a real race with Alex. Not watching from the shore — on the boat, with him.',
+    thought: { prompt: 'Who do you want there with you?', answer: 'Alex. We used to sail when he was ten. Then life happened, for both of us.' },
+    steps: [
+      { title: 'Two refresher sailing lessons', when: 'Sat mornings · 2 h' },
+      { title: 'Call Alex and pick a weekend', when: 'Sun · 20 min' },
+      { title: 'Sign us up for a club regatta', when: 'Wed evening · 30 min' },
+    ],
+    memo: 'I took this one from the helm. Alex says it was our best weekend since he was a kid.',
+    months: 6,
+    hours: 9,
+    art: 'yacht',
+    photo: regatta,
+    focus: '50% 40%',
+  },
   {
     id: 'margaret',
     name: 'Margaret',
@@ -62,44 +132,6 @@ export const STORIES: Story[] = [
     art: 'retreat',
   },
   {
-    id: 'elena',
-    name: 'Elena',
-    age: 56,
-    city: 'Lisbon',
-    chapter: 'Discovery',
-    title: 'Paris, finally, on my own',
-    words: 'Coffee on a terrace in Paris, with nowhere to be. I’ve said “next year” for thirty years.',
-    thought: { prompt: 'What would make it feel safe?', answer: 'A small hotel I’ve read about, and a plan for the first day only.' },
-    steps: [
-      { title: 'Renew my passport', when: 'Thu morning · 30 min' },
-      { title: 'Learn twenty phrases in French', when: '10 min a day' },
-      { title: 'Book a hotel near the Seine', when: 'Sat morning · 30 min' },
-    ],
-    memo: 'I walked eighteen kilometres a day and ordered everything in French. Nobody laughed.',
-    months: 5,
-    hours: 14,
-    art: 'paris',
-  },
-  {
-    id: 'tom',
-    name: 'Tom',
-    age: 68,
-    city: 'Brighton',
-    chapter: 'Freedom',
-    title: 'A week on the water',
-    words: 'Out on a boat along the coast with my grandson. Before he’s too old to want to.',
-    thought: { prompt: 'Who do you want there with you?', answer: 'Sam. He’s fourteen. The window is closing and I know it.' },
-    steps: [
-      { title: 'Two refresher sailing lessons', when: 'Sat mornings · 2 h' },
-      { title: 'Ask Sam’s parents for a week in July', when: 'Sun · 20 min' },
-      { title: 'Charter a skippered boat', when: 'Wed evening · 45 min' },
-    ],
-    memo: 'Sam took the helm on day three. He’s already asking about next summer.',
-    months: 6,
-    hours: 9,
-    art: 'yacht',
-  },
-  {
     id: 'priya',
     name: 'Priya',
     age: 45,
@@ -117,24 +149,5 @@ export const STORIES: Story[] = [
     months: 4,
     hours: 5,
     art: 'tuscany',
-  },
-  {
-    id: 'michael',
-    name: 'Michael',
-    age: 49,
-    city: 'Dublin',
-    chapter: 'Courage',
-    title: 'The car I always wanted',
-    words: 'A red two-seater. Not practical, not sensible. Mine.',
-    thought: { prompt: 'What would you say to the voice that says “too late”?', answer: 'That I’m not buying it for twenty-year-old me. I’m buying it for me now.' },
-    steps: [
-      { title: 'Work out the real monthly cost', when: 'Thu evening · 45 min' },
-      { title: 'Test drive two models', when: 'Sat morning · 2 h' },
-      { title: 'Sell the second family car', when: 'Over two weeks' },
-    ],
-    memo: 'First drive was along the coast road at sunset. I took the long way home.',
-    months: 8,
-    hours: 12,
-    art: 'car',
   },
 ]

@@ -6,6 +6,12 @@ import { Button, cx } from '../components/ui'
 import { STORIES, type Story } from '../data/stories'
 import { haptic, useUI } from '../lib/ui'
 
+/** The photo of the dream that came true, or its poster when there is none. */
+function Cover({ story, className }: { story: Story; className?: string }) {
+  if (story.photo) return <img src={story.photo} alt="" className={cx('block object-cover', className)} style={{ objectPosition: story.focus }} draggable={false} />
+  return <Poster art={story.art} className={className} />
+}
+
 const ease = [0.22, 1, 0.36, 1] as const
 const SLIDES = ['words', 'thought', 'steps', 'result'] as const
 type Slide = (typeof SLIDES)[number]
@@ -18,7 +24,7 @@ function Avatar({ story, size = 40, ring }: { story: Story; size?: number; ring?
   return (
     <span className={cx('relative shrink-0 rounded-full', ring && 'p-[2.5px] bg-gradient-to-tr from-sky to-sage')} style={{ width: size + (ring ? 5 : 0), height: size + (ring ? 5 : 0) }}>
       <span className={cx('block rounded-full overflow-hidden w-full h-full', ring && 'border-[2.5px] border-ink')}>
-        <Poster art={story.art} className="w-full h-full" />
+        <Cover story={story} className="w-full h-full" />
       </span>
     </span>
   )
@@ -102,7 +108,7 @@ function SlideBody({ story, slide }: { story: Story; slide: Slide }) {
   return (
     <div className="flex-1 flex flex-col justify-center min-h-0">
       <motion.div initial={{ opacity: 0, scale: 0.94, y: 16 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.9, ease }} className="min-h-0">
-        <Poster art={story.art} className="w-full max-h-[44vh] sm:max-h-[360px] aspect-[4/5] rounded-[26px] shadow-[0_40px_80px_rgba(0,0,0,0.55)]" />
+        <Cover story={story} className="w-full max-h-[44vh] sm:max-h-[360px] aspect-[4/5] rounded-[26px] shadow-[0_40px_80px_rgba(0,0,0,0.55)]" />
       </motion.div>
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.7, ease }}>
         <div className="mt-4 flex items-start justify-between gap-3">
@@ -162,7 +168,7 @@ function Player({ start, onClose, onStart, startLabel }: { start: number; onClos
     >
       {/* soft glow in the story's colours */}
       <div className="pointer-events-none absolute -top-24 inset-x-0 h-[420px] opacity-40 blur-[90px]">
-        <Poster art={story.art} className="w-full h-full" />
+        <Cover story={story} className="w-full h-full" />
       </div>
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink/30 via-ink/80 to-ink" />
 
@@ -235,7 +241,7 @@ function Hub({ onBack, onPlay }: { onBack: () => void; onPlay: (i: number) => vo
           {STORIES.map((s, i) => (
             <motion.button key={s.id} onClick={() => onPlay(i)} className="block w-full text-left" whileTap={{ scale: 0.98 }} data-testid={`story-${s.id}`}>
               <div className="relative">
-                <Poster art={s.art} className="w-full aspect-[16/11] rounded-[24px]" />
+                <Cover story={s} className="w-full aspect-[16/11] rounded-[24px]" />
                 <span className="absolute right-3 bottom-3 w-10 h-10 rounded-full bg-black/45 backdrop-blur-md flex items-center justify-center">
                   <Play size={16} fill="currentColor" className="ml-0.5" />
                 </span>

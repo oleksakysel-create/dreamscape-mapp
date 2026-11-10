@@ -172,7 +172,7 @@ test('success stories: watch from the intro, then start my own dreamscape', asyn
     await expect(player).toHaveAttribute('data-slide', slide)
   }
   await page.getByTestId('story-next').click()
-  await expect(player).toHaveAttribute('data-story', 'priya')
+  await expect(player).toHaveAttribute('data-story', 'margaret')
   await page.getByTestId('story-start').click()
   await expect(page.getByTestId('story-player')).toHaveCount(0)
   await expect(page.getByTestId('setup-next')).toBeVisible()
