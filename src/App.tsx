@@ -1,5 +1,5 @@
 import { AnimatePresence, MotionConfig, motion, type PanInfo } from 'framer-motion'
-import { LayoutGrid, Palette, Route, Sun } from 'lucide-react'
+import { LayoutGrid, Route, Sun } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Sheets } from './components/Sheets'
 import { cx, Toast } from './components/ui'
@@ -9,7 +9,6 @@ import Board from './screens/Board'
 import Chapter from './screens/Chapter'
 import Journey from './screens/Journey'
 import Onboarding from './screens/Onboarding'
-import Pause from './screens/Pause'
 import Profile from './screens/Profile'
 import Studio from './screens/Studio'
 import Today from './screens/Today'
@@ -22,7 +21,6 @@ const TABS: { id: Tab; label: string; icon: typeof Sun }[] = [
   { id: 'today', label: 'Today', icon: Sun },
   { id: 'journey', label: 'Journey', icon: Route },
   { id: 'board', label: 'Board', icon: LayoutGrid },
-  { id: 'pause', label: 'Pause', icon: Palette },
 ]
 
 /** iPhone status bar, drawn only inside the desktop phone frame (a real phone shows its own). */
@@ -59,7 +57,7 @@ function TabBar() {
   const tab = useUI((s) => s.tab)
   const setTab = useUI((s) => s.setTab)
   return (
-    <nav className="absolute bottom-0 inset-x-0 z-30 bg-[#101012]/95 backdrop-blur-xl border-t border-white/[0.08] pt-[7px] pb-[max(8px,env(safe-area-inset-bottom))] sm:pb-[30px] grid grid-cols-4 px-2" aria-label="Tab bar">
+    <nav className="absolute bottom-0 inset-x-0 z-30 bg-[#101012]/95 backdrop-blur-xl border-t border-white/[0.08] pt-[7px] pb-[max(8px,env(safe-area-inset-bottom))] sm:pb-[30px] grid grid-cols-3 px-6" aria-label="Tab bar">
       {TABS.map((t) => {
         const active = tab === t.id
         const Icon = t.icon
@@ -107,13 +105,13 @@ function Pushed({ id, onBack, children }: { id: string; onBack: () => void; chil
   )
 }
 
-const TAB_NAME: Record<Tab, string> = { today: 'Today', journey: 'Journey', board: 'Board', pause: 'Pause' }
+const TAB_NAME: Record<Tab, string> = { today: 'Today', journey: 'Journey', board: 'Board' }
 
 export default function App() {
   const onboarded = useStore((s) => Boolean(s.profile))
   const ui = useUI()
   const pushed = ui.chapter !== null || ui.profile
-  const screens: Record<Tab, ReactNode> = { today: <Today />, journey: <Journey />, board: <Board />, pause: <Pause /> }
+  const screens: Record<Tab, ReactNode> = { today: <Today />, journey: <Journey />, board: <Board /> }
 
   return (
     <MotionConfig reducedMotion="user">

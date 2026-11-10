@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Camera, Palette, PencilLine, Plus, Share } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { DreamCard } from '../components/DreamCard'
+import { MonthColoring } from '../components/MonthColoring'
 import { Button, cx, Eyebrow, NavBar, UnderlineTabs } from '../components/ui'
 import { getTheme } from '../data/themes'
 import { chapterMonthLong } from '../lib/dates'
@@ -238,13 +239,9 @@ function Result({ month }: { month: number }) {
       <Button
         variant="glass"
         className="w-full"
-        onClick={() => {
-          ui.openChapter(null)
-          ui.setTab('pause')
-          ui.openStudio(month)
-        }}
+        onClick={() => ui.openStudio(month)}
       >
-        <Palette size={18} /> Color this dream while you wait
+        <Palette size={18} /> Color this month’s sheet while you wait
       </Button>
     </div>
   )
@@ -279,6 +276,9 @@ export default function Chapter({ month, back, onBack }: { month: number; back: 
       </div>
       <div className="px-4">
         <DreamCard month={month} meta={false} minHeight={280} />
+        <div className="mt-3">
+          <MonthColoring month={month} label="Coloring of the month" />
+        </div>
       </div>
       <div className="px-5 pt-6 sticky top-[env(safe-area-inset-top)] sm:top-[54px] z-10 bg-ink/95 backdrop-blur">
         <UnderlineTabs value={tab} onChange={setTab} options={STAGES.map((s) => ({ ...s, done: done[s.id] }))} />

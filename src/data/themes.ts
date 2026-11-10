@@ -11,7 +11,7 @@ export interface Theme {
   /** Short line under the title */
   tagline: string
   intro: string
-  /** Coloring sheet for the Pause tab */
+  /** The month's coloring sheet */
   art: string
   dream: string
   questions: Question[]

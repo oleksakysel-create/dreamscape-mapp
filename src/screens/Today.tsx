@@ -1,5 +1,6 @@
-import { Camera, Check, ChevronRight, CircleDashed, Leaf, Palette, Share } from 'lucide-react'
+import { Camera, Check, CircleDashed, Leaf, Share } from 'lucide-react'
 import { DreamCard } from '../components/DreamCard'
+import { MonthColoring } from '../components/MonthColoring'
 import { Button, cx, IconButton, LargeTitle } from '../components/ui'
 import { THEMES } from '../data/themes'
 import { chapterFor, dayShort, longDay, minutesLabel, parseYmd, startOfWeek } from '../lib/dates'
@@ -105,16 +106,7 @@ export default function Today() {
       </section>
 
       <div className="px-4 mt-6">
-        <button onClick={() => ui.setTab('pause')} className="w-full h-[60px] px-3.5 rounded-[20px] bg-[#121213] border border-white/[0.07] flex items-center gap-3 text-left">
-          <span className="w-[34px] h-[34px] rounded-[11px] bg-white/[0.06] flex items-center justify-center shrink-0">
-            <Palette size={17} className="text-soft" />
-          </span>
-          <span className="flex-1">
-            <span className="block text-[14.5px] font-medium">A 10-minute pause</span>
-            <span className="block text-[12.5px] text-mute">Coloring, just to breathe out</span>
-          </span>
-          <ChevronRight size={16} className="text-mute" />
-        </button>
+        <MonthColoring month={month} />
       </div>
     </div>
   )

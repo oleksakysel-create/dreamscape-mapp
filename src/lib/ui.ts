@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export type Tab = 'today' | 'journey' | 'board' | 'pause'
+export type Tab = 'today' | 'journey' | 'board'
 export type SheetState =
   | { type: 'addStep'; month: number; title?: string }
   | { type: 'step'; id: string }

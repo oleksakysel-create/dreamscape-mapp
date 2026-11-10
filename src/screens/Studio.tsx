@@ -7,7 +7,7 @@ import { ColorCanvas, type CanvasHandle } from '../components/ColorCanvas'
 import { Button, cx, Eyebrow } from '../components/ui'
 import { getTheme } from '../data/themes'
 import { chapterOf, useStore } from '../lib/store'
-import { haptic, useUI } from '../lib/ui'
+import { haptic } from '../lib/ui'
 
 interface Op {
   id: string
@@ -24,7 +24,6 @@ export default function Studio({ month, onClose }: { month: number; onClose: () 
   const complete = useStore((s) => s.completeColoring)
   const realistic = useStore((s) => s.realisticBrush)
   const setRealistic = useStore((s) => s.setRealisticBrush)
-  const ui = useUI()
 
   const [fills, setFills] = useState<Record<string, string>>(saved.fills)
   const [past, setPast] = useState<Op[]>([])
@@ -118,7 +117,7 @@ export default function Studio({ month, onClose }: { month: number; onClose: () 
           <X size={20} />
         </button>
         <div className="flex-1 min-w-0">
-          <Eyebrow className="text-sky">Pause · chapter {month}</Eyebrow>
+          <Eyebrow className="text-sky">Chapter {month} · coloring of the month</Eyebrow>
           <div className="text-[20px] font-semibold tracking-tight leading-tight truncate">{theme.dream}</div>
         </div>
         <button onClick={undo} disabled={!past.length} aria-label="Undo" className="w-10 h-10 rounded-full bg-white/[0.07] flex items-center justify-center disabled:opacity-30">
@@ -217,16 +216,13 @@ export default function Studio({ month, onClose }: { month: number; onClose: () 
             </motion.div>
             <Eyebrow className="text-sky text-center mt-7">Sheet complete</Eyebrow>
             <h2 className="text-[28px] font-semibold tracking-tightest leading-tight text-center mt-2">A quiet ten minutes, well spent</h2>
-            <p className="text-[14.5px] text-mute text-center mt-2">{theme.dream}, colored in. Come back whenever you need a pause.</p>
+            <p className="text-[14.5px] text-mute text-center mt-2">This month’s sheet is colored in. It stays with the chapter.</p>
             <Button
               className="w-full mt-6"
-              onClick={() => {
-                close()
-                ui.setTab('pause')
-              }}
+              onClick={close}
               data-testid="studio-done"
             >
-              Back to Pause
+              Back to the chapter
             </Button>
             <Button variant="ghost" className="w-full" onClick={() => setDone(false)}>
               Keep looking

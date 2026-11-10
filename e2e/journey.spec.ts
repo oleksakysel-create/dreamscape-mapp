@@ -30,7 +30,7 @@ async function tapRegion(page: Page, id: string) {
   await page.mouse.click(pt!.x, pt!.y)
 }
 
-test('words on the card → plan → photo of the fulfilled dream → share → pause', async ({ page }) => {
+test('words on the card → plan → photo of the fulfilled dream → share → coloring of the month', async ({ page }) => {
   const errors = watch(page)
   await page.goto('/')
 
@@ -107,9 +107,8 @@ test('words on the card → plan → photo of the fulfilled dream → share → 
   await expect(page.getByTestId('dream-card')).toHaveAttribute('data-state', 'fulfilled')
   await expect(page.getByTestId('dream-card').getByRole('img')).toBeVisible()
 
-  // Pause: coloring as a separate, calm activity
-  await page.getByRole('button', { name: 'Pause', exact: true }).click()
-  await page.getByTestId('open-studio').click()
+  // The month's one coloring sheet lives with the chapter (opened here from Today)
+  await page.getByTestId('coloring-1').click()
   await expect(page.getByTestId('canvas')).toBeVisible()
   await page.waitForTimeout(800) // let the sheet finish sliding up
   const total = await page.locator('[data-region]').count()
