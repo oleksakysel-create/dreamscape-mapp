@@ -4,6 +4,7 @@
  *   npm run build:single  →  Dreamscape.html
  */
 import react from '@vitejs/plugin-react'
+import pkg from './package.json' with { type: 'json' }
 import { readFileSync } from 'node:fs'
 import { defineConfig, type Plugin } from 'vite'
 import { viteSingleFile } from 'vite-plugin-singlefile'
@@ -21,6 +22,7 @@ const standaloneHead = (): Plugin => ({
 })
 
 export default defineConfig({
+  define: { __APP_VERSION__: JSON.stringify(`v${pkg.version.split('.')[0]}`) },
   plugins: [react(), standaloneHead(), viteSingleFile()],
   base: './',
   publicDir: false,

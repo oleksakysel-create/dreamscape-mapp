@@ -109,7 +109,7 @@ export default function Profile({ back, onBack }: { back: string; onBack: () => 
             {data.demo ? 'Leave the example' : 'Start over'}
           </Button>
         )}
-        <p className="text-center text-[12px] text-mute/70">Dreamscape · Your age is no reason to forget your dreams</p>
+        <p className="text-center text-[12px] text-mute/70">Dreamscape {__APP_VERSION__} · Your age is no reason to forget your dreams</p>
       </div>
     </div>
   )

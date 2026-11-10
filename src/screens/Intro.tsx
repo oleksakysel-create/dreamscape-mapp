@@ -210,19 +210,6 @@ function ShowVisual() {
   )
 }
 
-function Mark({ size = 56 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 512 512" aria-hidden>
-      <rect width="512" height="512" rx="120" fill="#1D232B" />
-      <rect x="6" y="6" width="500" height="500" rx="114" fill="none" stroke="#9CCBF0" strokeOpacity=".25" strokeWidth="6" />
-      <path d="M136 300a120 120 0 0 1 240 0" fill="none" stroke="#9CCBF0" strokeWidth="24" strokeLinecap="round" />
-      <path d="M104 344h304" stroke="#9CCBF0" strokeWidth="18" strokeLinecap="round" />
-      <path d="M172 384h168" stroke="#9CCBF0" strokeOpacity=".45" strokeWidth="14" strokeLinecap="round" />
-      <circle cx="256" cy="186" r="15" fill="#DDEEFB" />
-    </svg>
-  )
-}
-
 function FinalVisual() {
   const photos = [
     { src: PHOTOS.beach, r: -9, x: -96, d: 0.1 },
@@ -342,13 +329,7 @@ export default function Intro({ onStart, onDemo, onStories }: { onStart: () => v
                 <span className="block whitespace-nowrap text-sky">at every age.</span>
               </h1>
             </motion.div>
-            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.3, duration: 0.7, ease }} className="mt-5 flex items-center gap-3">
-              <Mark size={40} />
-              <span className="text-[17px] text-soft">
-                Start with <span className="text-fg font-semibold">Dreamscape</span>
-              </span>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.8, duration: 0.7, ease }} className="mt-7 space-y-2.5">
+            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.3, duration: 0.7, ease }} className="mt-8 space-y-2.5">
               <Button className="w-full" onClick={onStart} data-testid="onb-next">
                 Start my dreamscape
               </Button>
