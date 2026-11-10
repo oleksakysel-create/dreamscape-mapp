@@ -1,4 +1,5 @@
 import { getArtwork } from '../art'
+import { PHOTOS } from '../assets/photos'
 import { THEMES } from '../data/themes'
 import { addDays, startOfWeek, ymd } from './dates'
 import type { Step } from './planner'
@@ -67,7 +68,7 @@ export function demoData(today = new Date()): Data {
       ], {
         title: 'Madeira',
         fulfilledAt: iso(day(7, 4)),
-        photo: './demo/beach.jpg',
+        photo: PHOTOS.beach,
         memo: 'Five days, no notifications. I ran into the ocean every single morning.',
         fills: partial('islands', 1),
         coloredAt: iso(day(4, 22)),
@@ -80,7 +81,7 @@ export function demoData(today = new Date()): Data {
       ], {
         title: 'My own car',
         fulfilledAt: iso(day(8, 16)),
-        photo: './demo/dream-car.jpg',
+        photo: PHOTOS.dreamCar,
         memo: 'Picked it up on a Tuesday after work. Still can’t stop smiling.',
       }),
       7: ch(7, ['A day on the water with friends, nobody checking their phones.', 'The school run on Wednesdays — my partner can take it.', '6', 'Hand over the Wednesday school run']),
@@ -92,7 +93,7 @@ export function demoData(today = new Date()): Data {
       ], {
         title: 'A night at the ballet',
         fulfilledAt: iso(day(9, 24)),
-        photo: './demo/ballet.jpg',
+        photo: PHOTOS.ballet,
         memo: 'Second tier, Swan Lake. It felt like stepping into another century.',
       }),
       10: {

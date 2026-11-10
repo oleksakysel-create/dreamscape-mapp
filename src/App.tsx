@@ -18,9 +18,9 @@ const IS_STANDALONE =
 const IS_ELECTRON = typeof navigator !== 'undefined' && /Electron/i.test(navigator.userAgent)
 
 const TABS: { id: Tab; label: string; icon: typeof Sun }[] = [
-  { id: 'today', label: 'Today', icon: Sun },
-  { id: 'journey', label: 'Journey', icon: Route },
   { id: 'board', label: 'Board', icon: LayoutGrid },
+  { id: 'journey', label: 'Journey', icon: Route },
+  { id: 'today', label: 'Today', icon: Sun },
 ]
 
 /** iPhone status bar, drawn only inside the desktop phone frame (a real phone shows its own). */

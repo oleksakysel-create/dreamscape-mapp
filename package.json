@@ -22,7 +22,8 @@
     "desktop": "concurrently -k -n vite,electron -c magenta,cyan \"vite\" \"wait-on http://localhost:5173 && node electron/launch.cjs\"",
     "desktop:prod": "vite build && electron .",
     "desktop:build": "vite build && electron-builder --mac",
-    "icons": "node scripts/icons.mjs"
+    "icons": "node scripts/icons.mjs",
+    "build:single": "vite build --config vite.single.config.ts && cp dist-single/index.html Dreamscape.html"
   },
   "dependencies": {
     "framer-motion": "^14.9.1",
@@ -46,6 +47,7 @@
     "tsx": "^4.23.15",
     "typescript": "^5.9.2",
     "vite": "^8.3.6",
+    "vite-plugin-singlefile": "^2.3.4",
     "vitest": "^5.1.0",
     "wait-on": "^9.5.1"
   },

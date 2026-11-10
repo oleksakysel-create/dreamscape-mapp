@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import { fileURLToPath } from 'node:url'
 
-const PHOTO = fileURLToPath(new URL('../public/demo/beach.jpg', import.meta.url))
+const PHOTO = fileURLToPath(new URL('../src/assets/demo/beach.jpg', import.meta.url))
 
 function watch(page: Page) {
   const errors: string[] = []

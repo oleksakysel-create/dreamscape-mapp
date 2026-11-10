@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Check, Share } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
+import { PHOTOS } from '../assets/photos'
 import { Quote } from '../components/DreamCard'
 import { Button, cx } from '../components/ui'
 import { haptic } from '../lib/ui'
@@ -179,7 +180,7 @@ function ShowVisual() {
   return (
     <div className="relative w-[min(290px,32vh)]">
       <motion.div initial={{ opacity: 0, scale: 0.92, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.9, ease }}>
-        <img src="./demo/ballet.jpg" alt="" className="w-full aspect-[4/5] object-cover rounded-[26px] shadow-[0_40px_80px_rgba(0,0,0,0.55)]" />
+        <img src={PHOTOS.ballet} alt="" className="w-full aspect-[4/5] object-cover rounded-[26px] shadow-[0_40px_80px_rgba(0,0,0,0.55)]" />
         <div className="mt-3 flex flex-col items-start gap-2 px-1">
           <span className="text-[17px] font-semibold tracking-tight whitespace-nowrap">A night at the ballet</span>
           <motion.span initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 1.1, type: 'spring', stiffness: 300, damping: 18 }} className="h-7 px-[10px] shrink-0 whitespace-nowrap rounded-full bg-sage/[0.16] text-sage text-[12px] font-semibold inline-flex items-center gap-1">
@@ -190,7 +191,7 @@ function ShowVisual() {
       <AnimatePresence>
         {shared && (
           <motion.div initial={{ opacity: 0, y: 40, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.6, ease }} className="absolute -right-10 top-[30%] w-[104px] rounded-[16px] overflow-hidden bg-ink border border-white/[0.14] shadow-[0_24px_50px_rgba(0,0,0,0.6)] rotate-[5deg]">
-            <img src="./demo/ballet.jpg" alt="" className="w-full aspect-[3/4] object-cover" />
+            <img src={PHOTOS.ballet} alt="" className="w-full aspect-[3/4] object-cover" />
             <div className="px-2.5 py-2">
               <div className="text-[10px] font-semibold">A night at the ballet</div>
               <div className="text-[7.5px] font-bold tracking-[0.1em] text-sky mt-0.5">DREAMSCAPE</div>
@@ -224,9 +225,9 @@ function Mark({ size = 56 }: { size?: number }) {
 
 function FinalVisual() {
   const photos = [
-    { src: './demo/beach.jpg', r: -9, x: -96, d: 0.1 },
-    { src: './demo/dream-car.jpg', r: 7, x: 96, d: 0.25 },
-    { src: './demo/ballet.jpg', r: -1, x: 0, d: 0.4 },
+    { src: PHOTOS.beach, r: -9, x: -96, d: 0.1 },
+    { src: PHOTOS.dreamCar, r: 7, x: 96, d: 0.25 },
+    { src: PHOTOS.ballet, r: -1, x: 0, d: 0.4 },
   ]
   return (
     <div className="relative w-[320px] h-[min(250px,30vh)]">

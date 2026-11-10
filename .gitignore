@@ -7,3 +7,5 @@ playwright-report/
 *.tsbuildinfo
 .DS_Store
 *.zip
+dist-single/
+Dreamscape.html
