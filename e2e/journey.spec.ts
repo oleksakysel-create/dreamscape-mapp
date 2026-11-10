@@ -135,6 +135,10 @@ test('example journey opens every screen without errors', async ({ page }) => {
   await page.getByTestId('nav-back').click()
   await page.getByRole('button', { name: 'Board', exact: true }).click()
   for (const m of [4, 6, 9]) await expect(page.getByTestId(`board-${m}`)).toHaveAttribute('data-fulfilled', 'true')
+  // overview dashboard
+  await expect(page.getByTestId('kpi-fulfilled')).toContainText('3')
+  await page.getByTestId('bar-6').click()
+  await expect(page.getByTestId('overview')).toContainText(/2 h 15 min/)
   await page.getByRole('button', { name: 'Today', exact: true }).click()
   await page.getByRole('button', { name: 'Profile' }).click()
   await page.getByTestId('reset').click()

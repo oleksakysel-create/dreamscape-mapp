@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { DreamTile } from '../components/DreamCard'
+import { Overview } from '../components/Overview'
 import { cx, LargeTitle } from '../components/ui'
 import { THEMES } from '../data/themes'
 import { chapterOf, phraseOf, useStore } from '../lib/store'
@@ -29,6 +30,10 @@ export default function Board() {
   return (
     <div className="pb-4">
       <LargeTitle title="Board" sub={`${came.length} came true · ${12 - came.length} on the way`} />
+      <div className="px-4 pb-7">
+        <Overview />
+      </div>
+      <h2 className="px-5 pb-3 text-[13px] font-medium tracking-[0.06em] uppercase text-mute">Dreams</h2>
       <div className="px-5 pb-4 flex gap-1.5" role="tablist" aria-label="Filter">
         {(
           [
