@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { getArtwork } from '../art'
+import { STORIES } from '../data/stories'
 import { THEMES } from '../data/themes'
 import { ymd } from './dates'
 import { findSlot, type Budget, type Horizon, type Step, type StepStatus, type WindowId } from './planner'
@@ -24,6 +25,10 @@ export interface Chapter {
   /** "idb:<key>" or a URL */
   photo?: string
   memo?: string
+  /** Shared dream: the name of the person you're doing it with */
+  partner?: string
+  /** The words were borrowed from a success story (its id) */
+  draftFrom?: string
 }
 
 export interface Data {
@@ -32,6 +37,8 @@ export interface Data {
   steps: Step[]
   realisticBrush: boolean
   demo: boolean
+  /** Success stories the person said “I want this too” to */
+  drafts: string[]
 }
 
 export interface NewStep {
@@ -41,6 +48,7 @@ export interface NewStep {
   horizon: Horizon
   date?: string
   window?: WindowId
+  owner?: 'partner'
 }
 
 interface Actions {
@@ -60,11 +68,14 @@ interface Actions {
   fulfill: (month: number, f: { date: string; photo?: string; memo?: string }) => void
   unfulfill: (month: number) => void
   setRealisticBrush: (v: boolean) => void
+  setPartner: (month: number, name?: string) => void
+  /** “I want this too”: borrow a story's dream as a draft (applied after setup if needed). */
+  takeDream: (storyId: string) => number | null
   load: (d: Data) => void
   reset: () => void
 }
 
-const empty = (): Data => ({ profile: null, chapters: {}, steps: [], realisticBrush: false, demo: false })
+const empty = (): Data => ({ profile: null, chapters: {}, steps: [], realisticBrush: false, demo: false, drafts: [] })
 const blank = (): Chapter => ({ answers: {}, fills: {} })
 const now = () => new Date().toISOString()
 const uid = () => `s_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`
@@ -74,9 +85,30 @@ export const useStore = create<Data & Actions>()(
     (set, get) => {
       const patchChapter = (month: number, patch: Partial<Chapter>) =>
         set((s) => ({ chapters: { ...s.chapters, [month]: { ...blank(), ...s.chapters[month], ...patch } } }))
+      /** Put a story's dream into the matching chapter, without overwriting the person's own words. */
+      const applyDraft = (id: string) => {
+        const story = STORIES.find((x) => x.id === id)
+        if (!story) return null
+        const theme = THEMES[story.month - 1]!
+        const c = chapterOf(get(), story.month)
+        const ownWords = (c.answers[theme.dreamQuestion] ?? '').trim()
+        patchChapter(story.month, {
+          ...(ownWords ? {} : { answers: { ...c.answers, [theme.dreamQuestion]: story.words }, draftFrom: story.id }),
+          title: c.title || story.title,
+        })
+        const taken = new Set(get().steps.filter((x) => x.month === story.month).map((x) => x.title.toLowerCase()))
+        const fresh: Step[] = story.steps
+          .filter((x) => !taken.has(x.title.toLowerCase()))
+          .map((x) => ({ id: uid(), month: story.month, title: x.title, minutes: 30, horizon: 'someday', status: 'planned', createdAt: now() }))
+        set((st) => ({ steps: [...st.steps, ...fresh] }))
+        return story.month
+      }
       return {
         ...empty(),
-        finishOnboarding: (profile) => set({ profile, demo: false }),
+        finishOnboarding: (profile) => {
+          set({ profile, demo: false })
+          for (const id of get().drafts) applyDraft(id)
+        },
         updateProfile: (p) => set((s) => (s.profile ? { profile: { ...s.profile, ...p } } : {})),
         saveAnswers: (month, answers) => patchChapter(month, { answers }),
         finishReflection: (month) => patchChapter(month, { reflectedAt: get().chapters[month]?.reflectedAt ?? now() }),
@@ -84,7 +116,7 @@ export const useStore = create<Data & Actions>()(
         addStep: (input) => {
           const { profile, steps } = get()
           let { date, window } = input
-          if (!date && input.horizon === 'week' && profile) {
+          if (!date && input.horizon === 'week' && profile && input.owner !== 'partner') {
             const slot = findSlot(profile, steps, input.minutes)
             if (slot) ({ date, window } = slot)
           }
@@ -119,7 +151,19 @@ export const useStore = create<Data & Actions>()(
         fulfill: (month, f) => patchChapter(month, { fulfilledAt: f.date, photo: f.photo ?? chapterOf(get(), month).photo, memo: f.memo }),
         unfulfill: (month) => patchChapter(month, { fulfilledAt: undefined, photo: undefined, memo: undefined }),
         setRealisticBrush: (realisticBrush) => set({ realisticBrush }),
-        load: (d) => set({ ...empty(), ...d }),
+        setPartner: (month, partner) => {
+          patchChapter(month, { partner: partner?.trim() || undefined })
+          if (!partner) set((s) => ({ steps: s.steps.map((x) => (x.month === month && x.owner === 'partner' ? { ...x, owner: undefined } : x)) }))
+        },
+        takeDream: (id) => {
+          if (!get().drafts.includes(id)) set((s) => ({ drafts: [...s.drafts, id] }))
+          return get().profile ? applyDraft(id) : null
+        },
+        load: (d) => {
+          const pending = get().drafts
+          set({ ...empty(), ...d, drafts: [...new Set([...d.drafts, ...pending])] })
+          if (d.profile) for (const id of pending) applyDraft(id)
+        },
         reset: () => set(empty()),
       }
     },
@@ -127,7 +171,7 @@ export const useStore = create<Data & Actions>()(
       name: 'dreamscape-v3',
       version: 3,
       storage: createJSONStorage(() => localStorage),
-      partialize: ({ profile, chapters, steps, realisticBrush, demo }) => ({ profile, chapters, steps, realisticBrush, demo }),
+      partialize: ({ profile, chapters, steps, realisticBrush, demo, drafts }) => ({ profile, chapters, steps, realisticBrush, demo, drafts }),
     },
   ),
 )

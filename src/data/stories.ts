@@ -11,7 +11,8 @@ export interface Story {
   name: string
   age: number
   city: string
-  /** Chapter theme it started in */
+  /** Chapter (month and theme) it started in */
+  month: number
   chapter: string
   title: string
   /** The dream in their own words, as written on day one */
@@ -35,6 +36,7 @@ export const STORIES: Story[] = [
     name: 'Elena',
     age: 56,
     city: 'Lisbon',
+    month: 9,
     chapter: 'Discovery',
     title: 'Paris, finally, on my own',
     words: 'Coffee on a terrace in Paris, with nowhere to be. I’ve said “next year” for thirty years.',
@@ -56,6 +58,7 @@ export const STORIES: Story[] = [
     name: 'Michael',
     age: 49,
     city: 'Dublin',
+    month: 6,
     chapter: 'Courage',
     title: 'The car I always wanted',
     words: 'A black sports car. Not practical, not sensible. Mine.',
@@ -77,6 +80,7 @@ export const STORIES: Story[] = [
     name: 'Tom',
     age: 61,
     city: 'Brighton',
+    month: 7,
     chapter: 'Freedom',
     title: 'A regatta with my son',
     words: 'Crewing a real race with Alex. Not watching from the shore — on the boat, with him.',
@@ -98,6 +102,7 @@ export const STORIES: Story[] = [
     name: 'Margaret',
     age: 63,
     city: 'Leeds',
+    month: 12,
     chapter: 'A new chapter',
     title: 'Northern lights from a glass igloo',
     words: 'I want to lie in bed and watch the sky turn green. I’ve wanted it since I was nine.',
@@ -117,6 +122,7 @@ export const STORIES: Story[] = [
     name: 'Daniel',
     age: 51,
     city: 'Rotterdam',
+    month: 2,
     chapter: 'Energy',
     title: 'One quiet weekend a month',
     words: 'A cabin by a lake, no laptop. Just once a month, I want to hear myself think.',
@@ -136,6 +142,7 @@ export const STORIES: Story[] = [
     name: 'Priya',
     age: 45,
     city: 'Manchester',
+    month: 11,
     chapter: 'Abundance',
     title: 'Harvest week in Tuscany',
     words: 'Picking grapes, long dinners outside, a week where I don’t look after anyone.',

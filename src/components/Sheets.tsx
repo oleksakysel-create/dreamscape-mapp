@@ -1,4 +1,4 @@
-import { CalendarArrowUp, Camera, Check, CircleDashed, Download, ImagePlus, Leaf, Share, Trash2 } from 'lucide-react'
+import { CalendarArrowUp, Camera, Check, CircleDashed, Download, ImagePlus, Leaf, Send, Share, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { getTheme } from '../data/themes'
 import { addDays, dayLabel, dayShort, minutesLabel, parseYmd, startOfWeek, ymd } from '../lib/dates'
@@ -8,6 +8,7 @@ import { FORMATS, renderShare, shareImage, type ShareFormat } from '../lib/share
 import { chapterMonthName } from '../lib/dates'
 import { chapterOf, dreamOf, phraseOf, useStore } from '../lib/store'
 import { haptic, useUI } from '../lib/ui'
+import { Pair } from './Together'
 import { Button, cx, Eyebrow, Segmented, Sheet } from './ui'
 
 const DURATIONS = [15, 30, 45, 60, 90, 120]
@@ -20,6 +21,8 @@ function AddStepSheet({ month, initialTitle, onClose }: { month: number; initial
   const [title, setTitle] = useState(initialTitle ?? '')
   const [minutes, setMinutes] = useState(30)
   const [horizon, setHorizon] = useState<Horizon>('week')
+  const partner = useStore((s) => chapterOf(s, month).partner)
+  const [who, setWho] = useState<'me' | 'partner'>('me')
   const auto = useMemo(() => findSlot(profile, steps, minutes), [profile, steps, minutes])
   const [pick, setPick] = useState<{ date: string; window: WindowId } | null>(null)
   useEffect(() => setPick(null), [minutes])
@@ -36,8 +39,13 @@ function AddStepSheet({ month, initialTitle, onClose }: { month: number; initial
   const save = () => {
     const t = title.trim()
     if (!t) return
-    const s = addStep({ month, title: t, minutes, horizon, ...(horizon === 'week' && chosen ? { date: chosen.date, window: chosen.window } : {}) })
     haptic(12)
+    if (who === 'partner' && partner) {
+      addStep({ month, title: t, minutes, horizon: 'month', owner: 'partner' })
+      notify(`Handed to ${partner}`, 'It won’t use your weekly time')
+      return onClose()
+    }
+    const s = addStep({ month, title: t, minutes, horizon, ...(horizon === 'week' && chosen ? { date: chosen.date, window: chosen.window } : {}) })
     if (s.date) {
       const d = parseYmd(s.date)
       const nextWeek = d >= addDays(startOfWeek(new Date()), 7)
@@ -57,6 +65,21 @@ function AddStepSheet({ month, initialTitle, onClose }: { month: number; initial
         data-testid="step-title"
         className="w-full h-14 border-0 border-b border-white/[0.16] bg-transparent text-[17px] outline-none focus:border-sky"
       />
+      {partner && (
+        <div>
+          <Eyebrow>Who takes it</Eyebrow>
+          <div className="mt-2">
+            <Segmented
+              value={who}
+              onChange={setWho}
+              options={[
+                { id: 'me', label: 'Me' },
+                { id: 'partner', label: partner },
+              ]}
+            />
+          </div>
+        </div>
+      )}
       <div>
         <Eyebrow>How long</Eyebrow>
         <div className="mt-2 grid grid-cols-6 gap-1.5" role="radiogroup" aria-label="Duration">
@@ -73,6 +96,7 @@ function AddStepSheet({ month, initialTitle, onClose }: { month: number; initial
           ))}
         </div>
       </div>
+      {who === 'me' && (
       <div>
         <Eyebrow>When</Eyebrow>
         <div className="mt-2">
@@ -114,6 +138,7 @@ function AddStepSheet({ month, initialTitle, onClose }: { month: number; initial
             <p className="mt-3 text-[14px] text-mute">The next few weeks are full. We’ll keep the step without a date until a window opens up.</p>
           ))}
       </div>
+      )}
       <Button className="w-full" onClick={save} disabled={!title.trim()} data-testid="save-step">
         Save step
       </Button>
@@ -127,6 +152,7 @@ function StepSheet({ id, onClose }: { id: string; onClose: () => void }) {
   const reschedule = useStore((s) => s.reschedule)
   const remove = useStore((s) => s.removeStep)
   const notify = useUI((s) => s.notify)
+  const partner = useStore((s) => (step ? chapterOf(s, step.month).partner : undefined))
   const [note, setNote] = useState(step?.result ?? '')
   if (!step) return null
   const when = step.date ? `${dayLabel(parseYmd(step.date))} · ${step.window ? windowOf(step.window).short : ''}` : step.horizon === 'month' ? 'This month' : 'No date'
@@ -145,6 +171,7 @@ function StepSheet({ id, onClose }: { id: string; onClose: () => void }) {
         <div className="text-[14px] text-mute mt-1">
           {when} · {minutesLabel(step.minutes)} · {getTheme(step.month)!.title}
         </div>
+        {step.owner === 'partner' && partner && <div className="mt-2 text-[13px] text-sage">{partner}’s step — you can log it for them</div>}
       </div>
       <div>
         <label htmlFor="result" className="text-[13px] text-mute">
@@ -373,6 +400,67 @@ function ShareSheet({ month }: { month: number }) {
   )
 }
 
+function PartnerSheet({ month, onClose }: { month: number; onClose: () => void }) {
+  const current = useStore((s) => chapterOf(s, month).partner)
+  const me = useStore((s) => s.profile?.name ?? '')
+  const dream = useStore((s) => phraseOf(s, month) || dreamOf(s, month))
+  const setPartner = useStore((s) => s.setPartner)
+  const notify = useUI((s) => s.notify)
+  const [name, setName] = useState(current ?? '')
+
+  const invite = async () => {
+    const n = name.trim()
+    if (!n) return
+    setPartner(month, n)
+    const text = `${me} wants to make a dream come true with you on Dreamscape: “${dream}”`
+    try {
+      if (navigator.share) await navigator.share({ title: 'Dreamscape', text })
+      else await navigator.clipboard?.writeText(text)
+    } catch {
+      /* closed the share sheet — the dream is shared anyway */
+    }
+    notify(current ? 'Invite sent again' : `Shared with ${n}`, 'Hand steps to them when you add a step')
+    onClose()
+  }
+
+  return (
+    <div className="space-y-5 pb-2">
+      <p className="text-[15px] leading-relaxed text-soft">One dream, two people. Split the steps — theirs don’t use your weekly time, and you both see the progress.</p>
+      {current && (
+        <div className="flex items-center gap-3">
+          <Pair me={me || 'You'} partner={current} size={36} />
+          <span className="text-[15px]">
+            You and <span className="font-semibold">{current}</span>
+          </span>
+        </div>
+      )}
+      <input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Their name"
+        aria-label="Partner's name"
+        data-testid="partner-name"
+        className="w-full h-14 border-0 border-b border-white/[0.16] bg-transparent text-[17px] outline-none focus:border-sky"
+      />
+      <Button className="w-full" onClick={() => void invite()} disabled={!name.trim()} data-testid="partner-invite">
+        <Send size={17} /> {current ? 'Send the invite again' : 'Send an invite'}
+      </Button>
+      {current && (
+        <button
+          onClick={() => {
+            setPartner(month, undefined)
+            notify('This dream is yours alone again')
+            onClose()
+          }}
+          className="w-full h-11 text-[14px] text-mute"
+        >
+          Stop sharing
+        </button>
+      )}
+    </div>
+  )
+}
+
 export function Sheets() {
   const sheet = useUI((s) => s.sheet)
   const openSheet = useUI((s) => s.openSheet)
@@ -388,6 +476,9 @@ export function Sheets() {
       </Sheet>
       <Sheet open={sheet?.type === 'attach'} onClose={close} title={fulfilled ? 'Your photo' : 'Did your dream come true?'}>
         {sheet?.type === 'attach' && <AttachSheet month={sheet.month} onClose={close} />}
+      </Sheet>
+      <Sheet open={sheet?.type === 'partner'} onClose={close} title="Do it together">
+        {sheet?.type === 'partner' && <PartnerSheet month={sheet.month} onClose={close} />}
       </Sheet>
       <Sheet open={sheet?.type === 'share'} onClose={close} title="Share your dream">
         {sheet?.type === 'share' && <ShareSheet month={sheet.month} />}

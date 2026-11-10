@@ -35,6 +35,8 @@ export interface Step {
   result?: string
   doneAt?: string
   createdAt: string
+  /** Shared dreams: a step the partner takes on (doesn't use your weekly time) */
+  owner?: 'partner'
 }
 
 export interface Budget {
@@ -49,7 +51,8 @@ export interface Slot {
   used: number
 }
 
-const counts = (s: Step) => s.status !== 'released'
+/** Steps that use your own weekly time. */
+const counts = (s: Step) => s.status !== 'released' && s.owner !== 'partner'
 
 /** All slots of the week starting at `weekStart`, with capacity and current load. */
 export function weekSlots(budget: Budget, steps: readonly Step[], weekStart: Date): Slot[] {
