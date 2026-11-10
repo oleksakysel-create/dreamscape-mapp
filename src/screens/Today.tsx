@@ -1,7 +1,6 @@
 import { Camera, Check, CircleDashed, Leaf, Share } from 'lucide-react'
 import { DreamCard } from '../components/DreamCard'
 import { MonthColoring } from '../components/MonthColoring'
-import { Initial } from '../components/Together'
 import { Button, cx, IconButton, LargeTitle } from '../components/ui'
 import { THEMES } from '../data/themes'
 import { chapterFor, dayShort, longDay, minutesLabel, parseYmd, startOfWeek } from '../lib/dates'
@@ -14,7 +13,6 @@ const NEXT_LABEL: Record<StageId, string> = { thoughts: 'Start with thoughts', p
 export function StepRow({ step, onClick }: { step: Step; onClick: () => void }) {
   const d = step.date ? parseYmd(step.date) : null
   const status = step.status
-  const partner = useStore((s) => (step.owner === 'partner' ? chapterOf(s, step.month).partner : undefined))
   return (
     <button onClick={onClick} className="w-full flex items-center gap-3 py-3 text-left" data-testid={`step-${step.id}`}>
       <span
@@ -31,11 +29,9 @@ export function StepRow({ step, onClick }: { step: Step; onClick: () => void }) 
       <span className="flex-1 min-w-0">
         <span className={cx('block text-[15px] truncate', status === 'released' && 'text-mute line-through')}>{step.title}</span>
         <span className="block text-[12.5px] text-mute mt-0.5">
-          {partner ? `${partner}’s step · ` : ''}
           {d ? `${dayShort(d)} ${d.getDate()} · ${step.window ? windowOf(step.window).short : ''}` : step.horizon === 'month' ? 'This month' : 'No date'} · {minutesLabel(step.minutes)}
         </span>
       </span>
-      {partner && <Initial name={partner} tone="sage" size={26} />}
     </button>
   )
 }

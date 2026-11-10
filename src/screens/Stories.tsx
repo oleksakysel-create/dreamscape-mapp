@@ -1,41 +1,15 @@
 import { AnimatePresence, motion, type PanInfo } from 'framer-motion'
-import { Check, ChevronLeft, Clock, Play, Plus, X } from 'lucide-react'
+import { Check, ChevronLeft, Clock, Play, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Poster } from '../components/Poster'
 import { Button, cx } from '../components/ui'
 import { STORIES, type Story } from '../data/stories'
-import { useStore } from '../lib/store'
 import { haptic, useUI } from '../lib/ui'
 
 /** The photo of the dream that came true, or its poster when there is none. */
 function Cover({ story, className }: { story: Story; className?: string }) {
   if (story.photo) return <img src={story.photo} alt="" className={cx('block object-cover', className)} style={{ objectPosition: story.focus }} draggable={false} />
   return <Poster art={story.art} className={className} />
-}
-
-/** “I want this too”: borrow the dream as a draft in the matching chapter. */
-function WantThis({ story, className, compact, onOpen }: { story: Story; className?: string; compact?: boolean; onOpen?: (month: number) => void }) {
-  const taken = useStore((s) => s.drafts.includes(story.id))
-  const onboarded = useStore((s) => Boolean(s.profile))
-  const take = useStore((s) => s.takeDream)
-  const notify = useUI((s) => s.notify)
-  const label = taken ? (onboarded && onOpen ? 'Open it' : 'Saved') : 'I want this too'
-  return (
-    <Button
-      variant={taken ? 'glass' : 'accent'}
-      className={cx(compact ? 'h-10 px-4 text-[14px]' : '', className)}
-      onClick={(e) => {
-        e.stopPropagation()
-        if (taken) return onboarded && onOpen?.(story.month)
-        haptic(14)
-        take(story.id)
-        notify(onboarded ? `Added to chapter ${story.month} · ${story.chapter}` : 'Saved for your journey', onboarded ? 'Their words as a draft — make them yours' : `It will wait in chapter ${story.month}`)
-      }}
-      data-testid={`want-${story.id}`}
-    >
-      {taken ? <Check size={16} strokeWidth={2.6} /> : <Plus size={17} strokeWidth={2.4} />} {label}
-    </Button>
-  )
 }
 
 const ease = [0.22, 1, 0.36, 1] as const
@@ -149,7 +123,7 @@ function SlideBody({ story, slide }: { story: Story; slide: Slide }) {
   )
 }
 
-function Player({ start, onClose, onStart, startLabel, onOpen }: { start: number; onClose: () => void; onStart: () => void; startLabel: string; onOpen: (month: number) => void }) {
+function Player({ start, onClose, onStart, startLabel }: { start: number; onClose: () => void; onStart: () => void; startLabel: string }) {
   const [si, setSi] = useState(start)
   const [k, setK] = useState(0)
   const story = STORIES[si]!
@@ -238,9 +212,8 @@ function Player({ start, onClose, onStart, startLabel, onOpen }: { start: number
         </motion.div>
       </AnimatePresence>
 
-      <div className={cx('relative z-10 px-6 pt-4 grid grid-cols-2 gap-2', BOTTOM)}>
-        <WantThis story={story} onOpen={onOpen} />
-        <Button onClick={onStart} data-testid="story-start">
+      <div className={cx('relative z-10 px-6 pt-4', BOTTOM)}>
+        <Button className="w-full" onClick={onStart} data-testid="story-start">
           {startLabel}
         </Button>
       </div>
@@ -248,7 +221,7 @@ function Player({ start, onClose, onStart, startLabel, onOpen }: { start: number
   )
 }
 
-function Hub({ onBack, onPlay, onOpen }: { onBack: () => void; onPlay: (i: number) => void; onOpen: (month: number) => void }) {
+function Hub({ onBack, onPlay }: { onBack: () => void; onPlay: (i: number) => void }) {
   const ages = STORIES.map((s) => s.age)
   return (
     <motion.div className="absolute inset-0 bg-ink overflow-y-auto no-scrollbar" initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', stiffness: 380, damping: 40 }} data-testid="stories">
@@ -266,7 +239,7 @@ function Hub({ onBack, onPlay, onOpen }: { onBack: () => void; onPlay: (i: numbe
 
         <div className="mt-7 space-y-7">
           {STORIES.map((s, i) => (
-            <motion.div key={s.id} role="button" tabIndex={0} onClick={() => onPlay(i)} onKeyDown={(e) => e.key === 'Enter' && onPlay(i)} className="block w-full text-left cursor-pointer" data-testid={`story-${s.id}`}>
+            <motion.button key={s.id} onClick={() => onPlay(i)} className="block w-full text-left" whileTap={{ scale: 0.98 }} data-testid={`story-${s.id}`}>
               <div className="relative">
                 <Cover story={s} className="w-full aspect-[16/11] rounded-[24px]" />
                 <span className="absolute right-3 bottom-3 w-10 h-10 rounded-full bg-black/45 backdrop-blur-md flex items-center justify-center">
@@ -285,8 +258,7 @@ function Hub({ onBack, onPlay, onOpen }: { onBack: () => void; onPlay: (i: numbe
                 </span>
               </div>
               <p className="mt-2 text-[14.5px] leading-relaxed text-soft line-clamp-2">“{s.words}”</p>
-              <WantThis story={s} compact className="mt-3" onOpen={onOpen} />
-            </motion.div>
+            </motion.button>
           ))}
         </div>
       </div>
@@ -296,23 +268,17 @@ function Hub({ onBack, onPlay, onOpen }: { onBack: () => void; onPlay: (i: numbe
 
 /** Success stories: a list of people who made it, and a stories-style player. */
 export default function Stories({ onStart, startLabel = 'Start my dreamscape' }: { onStart: () => void; startLabel?: string }) {
-  const { stories, openStories, openChapter, setTab } = useUI()
+  const { stories, openStories } = useUI()
   const close = () => openStories({ hub: false, play: null })
-  const openMonth = (m: number) => {
-    close()
-    setTab('journey')
-    openChapter(m)
-  }
   return (
     <div className={cx('absolute inset-0 z-[85]', !stories.hub && stories.play === null && 'pointer-events-none')}>
-      <AnimatePresence>{stories.hub && <Hub key="hub" onBack={close} onPlay={(i) => openStories({ hub: true, play: i })} onOpen={openMonth} />}</AnimatePresence>
+      <AnimatePresence>{stories.hub && <Hub key="hub" onBack={close} onPlay={(i) => openStories({ hub: true, play: i })} />}</AnimatePresence>
       <AnimatePresence>
         {stories.play !== null && (
           <Player
             key="player"
             start={stories.play}
             startLabel={startLabel}
-            onOpen={openMonth}
             onClose={() => openStories({ ...stories, play: null })}
             onStart={() => {
               close()

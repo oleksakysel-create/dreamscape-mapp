@@ -2,11 +2,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Camera, Palette, PencilLine, Plus, Share } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { DreamCard } from '../components/DreamCard'
-import { MemoriesCard } from '../components/MemoriesCard'
 import { MonthColoring } from '../components/MonthColoring'
-import { Together } from '../components/Together'
 import { Button, cx, Eyebrow, NavBar, UnderlineTabs } from '../components/ui'
-import { STORIES } from '../data/stories'
 import { getTheme } from '../data/themes'
 import { chapterMonthLong } from '../lib/dates'
 import { WINDOWS } from '../lib/planner'
@@ -26,7 +23,6 @@ function Thoughts({ month, onDone }: { month: number; onDone: () => void }) {
   const [error, setError] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const locked = Boolean(chapter.reflectedAt)
-  const borrowed = chapter.draftFrom ? STORIES.find((x) => x.id === chapter.draftFrom) : undefined
 
   useEffect(() => {
     clearTimeout(timer.current)
@@ -50,9 +46,6 @@ function Thoughts({ month, onDone }: { month: number; onDone: () => void }) {
             {i + 1} / {theme.questions.length}
             {q.id === theme.dreamQuestion && <span className="text-sky"> · shown on your dream card</span>}
           </div>
-          {q.id === theme.dreamQuestion && borrowed && answers[q.id] === borrowed.words && (
-            <div className="text-[13px] text-sage">Borrowed from {borrowed.name}’s story — rewrite it in your own words.</div>
-          )}
           <label htmlFor={q.id} className="block text-[19px] font-medium leading-[1.3] tracking-[-0.025em]">
             {q.prompt}
           </label>
@@ -286,14 +279,6 @@ export default function Chapter({ month, back, onBack }: { month: number; back: 
         <div className="mt-3">
           <MonthColoring month={month} label="Coloring of the month" />
         </div>
-        <div className="mt-3">
-          <Together month={month} />
-        </div>
-        {month === 12 && (
-          <div className="mt-3">
-            <MemoriesCard />
-          </div>
-        )}
       </div>
       <div className="px-5 pt-6 sticky top-[env(safe-area-inset-top)] sm:top-[54px] z-10 bg-ink/95 backdrop-blur">
         <UnderlineTabs value={tab} onChange={setTab} options={STAGES.map((s) => ({ ...s, done: done[s.id] }))} />
@@ -305,10 +290,8 @@ export default function Chapter({ month, back, onBack }: { month: number; back: 
               <Thoughts
                 month={month}
                 onDone={() => {
-                  setTab('plan')
-                  // the last chapter closes the year: play it back as memories
-                  if (month === 12) return ui.openMemories(true)
                   ui.notify('Thoughts saved', 'Now let’s turn them into a plan')
+                  setTab('plan')
                 }}
               />
             )}

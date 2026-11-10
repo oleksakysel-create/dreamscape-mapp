@@ -4,8 +4,6 @@ import { getTheme } from '../data/themes'
 import { dateLabel } from '../lib/dates'
 import { usePhoto } from '../lib/photos'
 import { chapterOf, chapterStages, dreamOf, phraseOf, useStore } from '../lib/store'
-import { STORIES } from '../data/stories'
-import { Pair } from './Together'
 import { Chip, cx, StageBar } from './ui'
 
 export function Quote({ size = 54 }: { size?: number }) {
@@ -29,7 +27,6 @@ export function DreamCard({ month, children, meta = true, minHeight = 400, class
   const phrase = phraseOf(data, month)
   const dream = dreamOf(data, month)
   const photo = usePhoto(chapter.fulfilledAt ? chapter.photo : undefined)
-  const borrowed = chapter.draftFrom ? STORIES.find((x) => x.id === chapter.draftFrom && x.words === phrase) : undefined
 
   if (chapter.fulfilledAt) {
     return (
@@ -51,7 +48,7 @@ export function DreamCard({ month, children, meta = true, minHeight = 400, class
           {(chapter.memo || phrase) && <p className="text-[15px] leading-relaxed text-soft">“{chapter.memo || phrase}”</p>}
           {meta && (
             <span className="text-[12.5px] text-mute">
-              Chapter {month} · {theme.title} · {st.done} step{st.done === 1 ? '' : 's'} done{chapter.partner ? ` · with ${chapter.partner}` : ''}
+              Chapter {month} · {theme.title} · {st.done} step{st.done === 1 ? '' : 's'} done
             </span>
           )}
           {children && <div className="pt-2">{children}</div>}
@@ -66,13 +63,7 @@ export function DreamCard({ month, children, meta = true, minHeight = 400, class
         <Chip>
           Chapter {month} · {theme.title}
         </Chip>
-        {chapter.partner ? (
-          <span className="inline-flex items-center gap-1.5 h-7 pl-1 pr-[11px] rounded-full bg-white/[0.08] text-[12px] text-soft">
-            <Pair me={data.profile?.name ?? 'You'} partner={chapter.partner} size={20} /> with {chapter.partner}
-          </span>
-        ) : (
-          <Chip tone="sky">{st.thoughts ? 'In progress' : 'New'}</Chip>
-        )}
+        <Chip tone="sky">{st.thoughts ? 'In progress' : 'New'}</Chip>
       </div>
       <div className="mt-8 flex flex-col gap-3.5">
         <Quote />
@@ -85,7 +76,7 @@ export function DreamCard({ month, children, meta = true, minHeight = 400, class
             {dream}. Describe it in your own words in Thoughts — it will live here.
           </p>
         )}
-        <span className="text-[13px] text-mute">{borrowed ? `From ${borrowed.name}’s story · make it yours` : phrase ? `Your words · ${dream}` : theme.tagline}</span>
+        <span className="text-[13px] text-mute">{phrase ? `Your words · ${dream}` : theme.tagline}</span>
       </div>
       <div className="mt-auto pt-7 flex flex-col gap-4">
         <StageBar done={[st.thoughts, st.plan, st.create, st.result]} />

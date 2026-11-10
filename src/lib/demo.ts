@@ -40,7 +40,6 @@ export function demoData(today = new Date()): Data {
 
   return {
     demo: true,
-    drafts: [],
     realisticBrush: false,
     profile: { name: 'Anna', start: ymd(start), weeklyMinutes: 240, windows: ['wd-morning', 'wd-evening', 'we-morning'] },
     chapters: {
@@ -104,7 +103,6 @@ export function demoData(today = new Date()): Data {
           [q(10, 3)]: 'One spontaneous trip a year — booked on a Friday, gone by Saturday.',
         },
         fills: partial('jet', 0.3),
-        partner: 'Mark',
       },
     },
     steps: [
@@ -118,8 +116,6 @@ export function demoData(today = new Date()): Data {
       step({ id: 'd8', month: 9, title: 'Buy the tickets the day they go on sale', minutes: 15, ...doneOn(9, 3, 'wd-morning'), result: 'Box seats, second tier.' }),
       step({ id: 'd9', month: 10, title: 'Break the big goal into three stages', minutes: 45, status: 'planned', date: ymd(addDays(wk, 1)), window: 'wd-evening', createdAt: iso(addDays(today, -3)) }),
       step({ id: 'd10', month: 10, title: 'Find a community with similar goals', minutes: 30, status: 'planned', date: ymd(addDays(wk, 5)), window: 'we-morning', createdAt: iso(addDays(today, -3)) }),
-      step({ id: 'd11', month: 10, title: 'Price out a small charter for two', minutes: 45, owner: 'partner', horizon: 'month', status: 'done', doneAt: iso(addDays(today, -2)), createdAt: iso(addDays(today, -3)), result: 'Cheaper than we thought if we fly on a Tuesday.' }),
-      step({ id: 'd12', month: 10, title: 'Make a list of ten places within three hours', minutes: 30, owner: 'partner', horizon: 'month', status: 'planned', createdAt: iso(addDays(today, -3)) }),
     ],
   }
 }

@@ -10,7 +10,6 @@ import Chapter from './screens/Chapter'
 import Journey from './screens/Journey'
 import Onboarding from './screens/Onboarding'
 import Profile from './screens/Profile'
-import Memories from './screens/Memories'
 import Stories from './screens/Stories'
 import Studio from './screens/Studio'
 import Today from './screens/Today'
@@ -160,8 +159,7 @@ export default function App() {
                 <TabBar />
                 <AnimatePresence>{ui.studio !== null && <Studio key={ui.studio} month={ui.studio} onClose={() => ui.openStudio(null)} />}</AnimatePresence>
                 <Sheets />
-                <Stories onStart={() => {}} startLabel="My journey" />
-                <Memories />
+                <Stories onStart={() => {}} startLabel="Back to my journey" />
               </>
             )}
 
