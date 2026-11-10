@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Check, ChevronRight } from 'lucide-react'
 import { cx, LargeTitle } from '../components/ui'
+import { StoriesRail } from './Stories'
 import { THEMES } from '../data/themes'
 import { chapterFor, chapterMonthName } from '../lib/dates'
 import { usePhoto } from '../lib/photos'
@@ -28,6 +29,7 @@ export default function Journey() {
   return (
     <div className="pb-4">
       <LargeTitle title="Journey" sub={`12 chapters · ${fulfilled} came true`} />
+      <StoriesRail />
       <ol className="px-4 space-y-2">
         {THEMES.map((t, i) => {
           const st = chapterStages(data, t.month)

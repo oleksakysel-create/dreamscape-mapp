@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Check, Share } from 'lucide-react'
+import { Check, Play, Share } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { PHOTOS } from '../assets/photos'
 import { Quote } from '../components/DreamCard'
@@ -266,7 +266,7 @@ const SCENES: Scene[] = [
   { id: 'show', eyebrow: '05 · Result', title: 'Show your success to the world.', text: 'Add a photo of the dream that came true — and share it.', visual: () => <ShowVisual />, ms: 5200 },
 ]
 
-export default function Intro({ onStart, onDemo }: { onStart: () => void; onDemo: () => void }) {
+export default function Intro({ onStart, onDemo, onStories }: { onStart: () => void; onDemo: () => void; onStories: () => void }) {
   const [i, setI] = useState(0)
   // in film mode, wait for the recorder to say "action"
   const [rolling, setRolling] = useState(!FILM)
@@ -337,10 +337,9 @@ export default function Intro({ onStart, onDemo }: { onStart: () => void; onDemo
               <FinalVisual />
             </div>
             <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.8, ease }}>
-              <h1 className="text-[40px] font-semibold leading-[1.02] tracking-[-0.05em]">
-                You can achieve more
-                <br />
-                <span className="text-sky">at every age.</span>
+              <h1 className="text-[34px] font-semibold leading-[1.06] tracking-[-0.045em]" data-testid="intro-title">
+                <span className="block whitespace-nowrap">You can achieve more</span>
+                <span className="block whitespace-nowrap text-sky">at every age.</span>
               </h1>
             </motion.div>
             <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.3, duration: 0.7, ease }} className="mt-5 flex items-center gap-3">
@@ -349,12 +348,15 @@ export default function Intro({ onStart, onDemo }: { onStart: () => void; onDemo
                 Start with <span className="text-fg font-semibold">Dreamscape</span>
               </span>
             </motion.div>
-            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.8, duration: 0.7, ease }} className="mt-8">
+            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.8, duration: 0.7, ease }} className="mt-7 space-y-2.5">
               <Button className="w-full" onClick={onStart} data-testid="onb-next">
-                Start my journey
+                Start my dreamscape
               </Button>
-              <Button variant="ghost" className="mt-1 w-full" onClick={onDemo} data-testid="onb-demo">
-                See an example
+              <Button variant="glass" className="w-full" onClick={onStories} data-testid="onb-stories">
+                <Play size={15} fill="currentColor" /> Watch people who already achieved
+              </Button>
+              <Button variant="ghost" className="w-full !mt-0.5" onClick={onDemo} data-testid="onb-demo">
+                Watch an example
               </Button>
             </motion.div>
           </motion.div>

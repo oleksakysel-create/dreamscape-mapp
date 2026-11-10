@@ -14,6 +14,8 @@ interface UI {
   profile: boolean
   studio: number | null
   sheet: SheetState
+  /** Success stories: the list (hub) and/or the story being watched */
+  stories: { hub: boolean; play: number | null }
   toast: { title: string; sub?: string } | null
   setTab: (t: Tab) => void
   openChapter: (m: number | null) => void
@@ -21,6 +23,7 @@ interface UI {
   openStudio: (m: number | null) => void
   openSheet: (s: SheetState) => void
   notify: (title: string, sub?: string) => void
+  openStories: (s: { hub: boolean; play: number | null }) => void
 }
 
 let toastTimer: ReturnType<typeof setTimeout> | undefined
@@ -32,6 +35,8 @@ export const useUI = create<UI>((set) => ({
   studio: null,
   sheet: null,
   toast: null,
+  stories: { hub: false, play: null },
+  openStories: (stories) => set({ stories }),
   setTab: (tab) => set({ tab, chapter: null, profile: false }),
   openChapter: (chapter) => set({ chapter }),
   openProfile: (profile) => set({ profile }),

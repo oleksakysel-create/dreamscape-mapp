@@ -156,3 +156,25 @@ test('desktop shows the app inside an iPhone frame with a status bar @desktop', 
   expect(box!.x).toBeGreaterThan(400)
   await expect(page.getByText('9:41')).toBeVisible()
 })
+
+test('success stories: watch from the intro, then start my own dreamscape', async ({ page }) => {
+  const errors = watch(page)
+  await page.goto('/')
+  await page.getByTestId('intro-skip').click()
+  await page.getByTestId('onb-stories').click()
+  await expect(page.getByTestId('stories')).toBeVisible()
+  await page.getByTestId('story-tom').click()
+  const player = page.getByTestId('story-player')
+  await expect(player).toHaveAttribute('data-story', 'tom')
+  await expect(player).toHaveAttribute('data-slide', 'words')
+  for (const slide of ['thought', 'steps', 'result']) {
+    await page.getByTestId('story-next').click()
+    await expect(player).toHaveAttribute('data-slide', slide)
+  }
+  await page.getByTestId('story-next').click()
+  await expect(player).toHaveAttribute('data-story', 'priya')
+  await page.getByTestId('story-start').click()
+  await expect(page.getByTestId('story-player')).toHaveCount(0)
+  await expect(page.getByTestId('setup-next')).toBeVisible()
+  expect(errors).toEqual([])
+})

@@ -6,14 +6,16 @@ import { chapterMonthLong } from '../lib/dates'
 import { demoData } from '../lib/demo'
 import { WINDOWS, type WindowId } from '../lib/planner'
 import { firstOfMonth, useStore } from '../lib/store'
-import { haptic } from '../lib/ui'
+import { haptic, useUI } from '../lib/ui'
 import Intro from './Intro'
+import Stories from './Stories'
 
 const HOURS = [60, 120, 180, 300, 480]
 
 export default function Onboarding() {
   const finish = useStore((s) => s.finishOnboarding)
   const load = useStore((s) => s.load)
+  const openStories = useUI((s) => s.openStories)
   const [intro, setIntro] = useState(true)
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
@@ -42,7 +44,8 @@ export default function Onboarding() {
   if (intro)
     return (
       <motion.div className="absolute inset-0 z-[70]" exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-        <Intro onStart={() => setIntro(false)} onDemo={() => load(demoData())} />
+        <Intro onStart={() => setIntro(false)} onDemo={() => load(demoData())} onStories={() => openStories({ hub: true, play: null })} />
+        <Stories onStart={() => setIntro(false)} />
       </motion.div>
     )
 
